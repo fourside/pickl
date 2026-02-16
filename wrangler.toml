@@ -1,0 +1,16 @@
+name = "pickl"
+main = "worker.ts"
+compatibility_date = "2025-04-01"
+
+[assets]
+not_found_handling = "single-page-application"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "pickl"
+database_id = "48bf6b42-3bed-4bc4-af57-4d0f0e89e847"
+migrations_dir = "migrations"
+
+
+[vars]
+JWT_SECRET = "dev-secret-change-in-production"

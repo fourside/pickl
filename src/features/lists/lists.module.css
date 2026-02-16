@@ -1,0 +1,81 @@
+.page {
+  padding: env(safe-area-inset-top, 0) 1rem env(safe-area-inset-bottom, 0);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.settingsLink {
+  padding: 0.5rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: 1.25rem;
+}
+
+.listGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: inherit;
+}
+
+.card:active {
+  background: var(--color-surface-active);
+}
+
+.cardName {
+  font-weight: 600;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.badgeInactive {
+  background: var(--color-surface-active);
+  color: var(--color-text-muted);
+}
+
+.inputWrapper {
+  padding: 1rem 0;
+}
+
+.inputWrapper input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: 2rem 0;
+}
