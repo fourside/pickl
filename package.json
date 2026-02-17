@@ -15,7 +15,8 @@
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "deploy": "wrangler deploy",
-    "ladle": "ladle serve"
+    "ladle": "ladle serve",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
