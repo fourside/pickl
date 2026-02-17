@@ -195,26 +195,6 @@ itemsRoutes.patch("/:listId/:itemId", async (c) => {
   });
 });
 
-// Delete an item (soft delete)
-itemsRoutes.delete("/:listId/:itemId", async (c) => {
-  const listId = c.req.param("listId");
-  const itemId = c.req.param("itemId");
-  const denied = await requireParticipant(c, listId);
-  if (denied) return denied;
-
-  const db = c.get("db");
-  const now = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
-
-  await db
-    .updateTable("items")
-    .set({ deleted_at: now, updated_at: now })
-    .where("id", "=", itemId)
-    .where("list_id", "=", listId)
-    .execute();
-
-  return c.json({ ok: true });
-});
-
 // Delete all checked items in a list
 itemsRoutes.delete("/:listId/checked", async (c) => {
   const listId = c.req.param("listId");
@@ -230,6 +210,26 @@ itemsRoutes.delete("/:listId/checked", async (c) => {
     .where("list_id", "=", listId)
     .where("checked", "=", 1)
     .where("deleted_at", "is", null)
+    .execute();
+
+  return c.json({ ok: true });
+});
+
+// Delete an item (soft delete)
+itemsRoutes.delete("/:listId/:itemId", async (c) => {
+  const listId = c.req.param("listId");
+  const itemId = c.req.param("itemId");
+  const denied = await requireParticipant(c, listId);
+  if (denied) return denied;
+
+  const db = c.get("db");
+  const now = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
+
+  await db
+    .updateTable("items")
+    .set({ deleted_at: now, updated_at: now })
+    .where("id", "=", itemId)
+    .where("list_id", "=", listId)
     .execute();
 
   return c.json({ ok: true });

@@ -1,3 +1,4 @@
+import { TrashIcon } from "../../shared/components/icons";
 import type { ItemData } from "./api";
 import styles from "./list-detail.module.css";
 
@@ -31,7 +32,7 @@ export function ItemRow({
           onClick={() => onDelete(item.id)}
           aria-label={`Delete ${item.text}`}
         >
-          Delete
+          <TrashIcon />
         </button>
       )}
     </div>

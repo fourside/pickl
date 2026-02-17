@@ -2,7 +2,7 @@ import type { GlobalProvider } from "@ladle/react";
 import { useEffect, useState } from "react";
 import { MemoryRouter } from "react-router";
 import { SWRConfig } from "swr";
-import { AuthProvider } from "../src/shared/auth/auth-context";
+import { AuthProvider } from "../src/front/shared/auth/auth-context";
 
 let mswReady = false;
 
@@ -10,7 +10,7 @@ async function startMsw() {
   if (mswReady) return;
   const [{ setupWorker }, { handlers }] = await Promise.all([
     import("msw/browser"),
-    import("../src/testing/handlers"),
+    import("../src/front/testing/handlers"),
   ]);
   const worker = setupWorker(...handlers);
   await worker.start({ onUnhandledRequest: "bypass" });

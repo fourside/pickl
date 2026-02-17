@@ -15,6 +15,7 @@ import { useCallback, useState } from "react";
 import { Link, useParams } from "react-router";
 import useSWR from "swr";
 import { swrFetcher } from "../../shared/api/client";
+import { ArrowLeftIcon } from "../../shared/components/icons";
 import { InputBar } from "../../shared/components/input-bar";
 import type { ListItem } from "../lists/api";
 import type { ItemData } from "./api";
@@ -130,8 +131,8 @@ export function ListDetailPage() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <Link to="/" className={styles.backLink}>
-          &larr;
+        <Link to="/" className={styles.backLink} aria-label="Back">
+          <ArrowLeftIcon />
         </Link>
         <h1>{list?.name ?? "..."}</h1>
       </div>

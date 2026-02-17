@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import useSWR from "swr";
 import { swrFetcher } from "../../shared/api/client";
+import { SettingsIcon } from "../../shared/components/icons";
 import { InputBar } from "../../shared/components/input-bar";
 import type { ListItem } from "./api";
 import { createList } from "./api";
@@ -21,8 +22,12 @@ export function ListsPage() {
     <div className={styles.page}>
       <div className={styles.header}>
         <h1>Pickl</h1>
-        <Link to="/settings" className={styles.settingsLink}>
-          Settings
+        <Link
+          to="/settings"
+          className={styles.settingsLink}
+          aria-label="Settings"
+        >
+          <SettingsIcon />
         </Link>
       </div>
 

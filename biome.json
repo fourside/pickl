@@ -19,6 +19,6 @@
     }
   },
   "files": {
-    "includes": ["models/**", "src/**", "api/**", "*.ts", "*.json"]
+    "includes": ["src/**", "*.ts", "*.json"]
   }
 }

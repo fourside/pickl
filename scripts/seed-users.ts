@@ -1,20 +1,25 @@
 import { execSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 
-const USERS = [
-  { email: "user1@pickl.app", name: "User 1" },
-  { email: "user2@pickl.app", name: "User 2" },
+interface User {
+  email: string;
+  name: string;
+}
+
+const USERS: User[] = [
+  { email: "fourside@gmail.com", name: "fourside" },
+  // { email: "user2@pickl.app", name: "User 2" },
 ];
 
 const isRemote = process.argv.includes("--remote");
 const flag = isRemote ? "--remote" : "--local";
 
-function generatePassword() {
+function generatePassword(): string {
   return randomBytes(4).toString("hex"); // 8 characters
 }
 
 // PBKDF2 hash using Web Crypto API compatible format
-async function hashPassword(password) {
+async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(16);
   const keyMaterial = await crypto.subtle.importKey(
     "raw",
@@ -65,7 +70,7 @@ async function main() {
       console.log(`    Password: ${password}`);
       console.log();
     } catch (e) {
-      console.error(`  Failed to seed ${user.email}:`, e.message);
+      console.error(`  Failed to seed ${user.email}:`, (e as Error).message);
     }
   }
 

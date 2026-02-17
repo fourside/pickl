@@ -19,8 +19,6 @@
   },
   "include": [
     "src",
-    "api",
-    "models",
     "vite.config.ts",
     "vitest.config.ts",
     "vitest.config.workers.ts"
