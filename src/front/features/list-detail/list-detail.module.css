@@ -27,6 +27,23 @@
   font-weight: 700;
 }
 
+.editableName {
+  cursor: pointer;
+}
+
+.nameInput {
+  font-size: 1.25rem;
+  font-weight: 700;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  border-bottom: 2px solid var(--color-primary);
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+}
+
 .joinBanner {
   display: flex;
   align-items: center;

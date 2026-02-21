@@ -11,7 +11,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import useSWR from "swr";
 import { swrFetcher } from "../../shared/api/client";
@@ -26,6 +26,7 @@ import {
   joinList,
   reorderItems,
   updateItem,
+  updateListName,
 } from "./api";
 import { ItemRow } from "./item-row";
 import styles from "./list-detail.module.css";
@@ -34,6 +35,9 @@ import { SortableItem } from "./sortable-item";
 export function ListDetailPage() {
   const { id: listId } = useParams<{ id: string }>();
   const [isDragging, setIsDragging] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editName, setEditName] = useState("");
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   const { data: lists, mutate: mutateLists } = useSWR<ListItem[]>(
     "/lists",
@@ -105,6 +109,29 @@ export function ListDetailPage() {
     mutateLists();
   }, [listId, mutateLists]);
 
+  const handleStartEditName = useCallback(() => {
+    if (!list || !isParticipant) return;
+    setEditName(list.name);
+    setIsEditingName(true);
+    requestAnimationFrame(() => nameInputRef.current?.select());
+  }, [list, isParticipant]);
+
+  const handleSaveName = useCallback(async () => {
+    const trimmed = editName.trim();
+    if (!listId || !trimmed || trimmed === list?.name) {
+      setIsEditingName(false);
+      return;
+    }
+    mutateLists(
+      (prev) =>
+        prev?.map((l) => (l.id === listId ? { ...l, name: trimmed } : l)),
+      false,
+    );
+    setIsEditingName(false);
+    await updateListName(listId, trimmed);
+    mutateLists();
+  }, [listId, editName, list?.name, mutateLists]);
+
   const handleDragEnd = useCallback(
     async (event: DragEndEvent) => {
       setIsDragging(false);
@@ -134,7 +161,33 @@ export function ListDetailPage() {
         <Link to="/" className={styles.backLink} aria-label="Back">
           <ArrowLeftIcon />
         </Link>
-        <h1>{list?.name ?? "..."}</h1>
+        {isEditingName ? (
+          <input
+            ref={nameInputRef}
+            className={styles.nameInput}
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            onBlur={handleSaveName}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSaveName();
+              if (e.key === "Escape") setIsEditingName(false);
+            }}
+          />
+        ) : (
+          <h1
+            onClick={isParticipant ? handleStartEditName : undefined}
+            onKeyDown={
+              isParticipant
+                ? (e) => {
+                    if (e.key === "Enter") handleStartEditName();
+                  }
+                : undefined
+            }
+            className={isParticipant ? styles.editableName : undefined}
+          >
+            {list?.name ?? "..."}
+          </h1>
+        )}
       </div>
 
       {!isParticipant && (

@@ -21,6 +21,11 @@ export const CreateListRequestSchema = v.object({
 });
 export type CreateListRequest = v.InferOutput<typeof CreateListRequestSchema>;
 
+export const UpdateListRequestSchema = v.object({
+  name: v.pipe(v.string(), v.nonEmpty()),
+});
+export type UpdateListRequest = v.InferOutput<typeof UpdateListRequestSchema>;
+
 export type ListParticipant = {
   listId: string;
   userId: string;

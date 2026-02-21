@@ -1,6 +1,9 @@
 import { Hono } from "hono";
 import * as v from "valibot";
-import { CreateListRequestSchema } from "../../models/list";
+import {
+  CreateListRequestSchema,
+  UpdateListRequestSchema,
+} from "../../models/list";
 import type { Env } from "../index";
 
 export const listsRoutes = new Hono<Env>();
@@ -84,6 +87,40 @@ listsRoutes.post("/", async (c) => {
     },
     201,
   );
+});
+
+// Update list name
+listsRoutes.patch("/:id", async (c) => {
+  const listId = c.req.param("id");
+  const userId = c.get("userId");
+  const db = c.get("db");
+
+  const participant = await db
+    .selectFrom("list_participants")
+    .select("user_id")
+    .where("list_id", "=", listId)
+    .where("user_id", "=", userId)
+    .executeTakeFirst();
+
+  if (!participant) {
+    return c.json({ error: "Not a participant" }, 403);
+  }
+
+  const body = await c.req.json();
+  const result = v.safeParse(UpdateListRequestSchema, body);
+  if (!result.success) {
+    return c.json({ error: "Invalid request" }, 400);
+  }
+
+  const now = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
+
+  await db
+    .updateTable("lists")
+    .set({ name: result.output.name, updated_at: now })
+    .where("id", "=", listId)
+    .execute();
+
+  return c.json({ ok: true });
 });
 
 // Join a list

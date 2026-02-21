@@ -53,3 +53,10 @@ export function reorderItems(listId: string, itemIds: string[]): Promise<void> {
 export function joinList(listId: string): Promise<void> {
   return apiFetch(`/lists/${listId}/join`, { method: "POST" });
 }
+
+export function updateListName(listId: string, name: string): Promise<void> {
+  return apiFetch(`/lists/${listId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ name }),
+  });
+}
