@@ -17,5 +17,6 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm run lint
+      - run: npm run knip
       - run: npm run test:all
       - run: npm run build
