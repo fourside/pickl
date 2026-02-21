@@ -35,10 +35,6 @@ export function deleteItem(listId: string, itemId: string): Promise<void> {
   return apiFetch(`/items/${listId}/${itemId}`, { method: "DELETE" });
 }
 
-export function deleteCheckedItems(listId: string): Promise<void> {
-  return apiFetch(`/items/${listId}/checked`, { method: "DELETE" });
-}
-
 export function reorderItems(listId: string, itemIds: string[]): Promise<void> {
   return apiFetch(`/items/${listId}/reorder`, {
     method: "PUT",

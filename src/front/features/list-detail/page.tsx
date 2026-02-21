@@ -22,7 +22,6 @@ import type { ListItem } from "../lists/api";
 import type { ItemData } from "./api";
 import {
   createItem,
-  deleteCheckedItems,
   deleteItem,
   joinList,
   reorderItems,
@@ -100,12 +99,6 @@ export function ListDetailPage() {
     },
     [listId, mutateItems],
   );
-
-  const handleClearChecked = useCallback(async () => {
-    if (!listId) return;
-    mutateItems((prev) => prev?.filter((item) => !item.checked), false);
-    await deleteCheckedItems(listId);
-  }, [listId, mutateItems]);
 
   const handleJoin = useCallback(async () => {
     if (!listId) return;
@@ -243,15 +236,6 @@ export function ListDetailPage() {
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionTitle}>Done</span>
-            {isParticipant && (
-              <button
-                type="button"
-                className={styles.clearButton}
-                onClick={handleClearChecked}
-              >
-                Clear
-              </button>
-            )}
           </div>
           <div className={styles.itemList}>
             {checkedItems.map((item) => (

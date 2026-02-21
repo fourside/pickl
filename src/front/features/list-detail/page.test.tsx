@@ -92,35 +92,6 @@ describe("ListDetailPage", () => {
     });
   });
 
-  it("shows Clear button for participants in Done section", async () => {
-    renderDetail("list-1");
-
-    expect(await screen.findByText("Done")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Clear" })).toBeInTheDocument();
-  });
-
-  it("hides Clear button for non-participants", async () => {
-    renderDetail("list-2");
-
-    await screen.findByText("Done");
-    expect(
-      screen.queryByRole("button", { name: "Clear" }),
-    ).not.toBeInTheDocument();
-  });
-
-  it("clears checked items when Clear is clicked", async () => {
-    const user = userEvent.setup();
-    renderDetail("list-1");
-
-    await screen.findByText("Bread");
-
-    await user.click(screen.getByRole("button", { name: "Clear" }));
-
-    await waitFor(() => {
-      expect(screen.queryByText("Bread")).not.toBeInTheDocument();
-    });
-  });
-
   it("shows 'No items yet' when list is empty", async () => {
     server.use(http.get("/api/items/:listId", () => HttpResponse.json([])));
     renderDetail("list-1");

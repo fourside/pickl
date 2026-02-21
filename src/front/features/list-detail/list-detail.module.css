@@ -98,15 +98,6 @@
   text-transform: uppercase;
 }
 
-.clearButton {
-  font-size: 0.75rem;
-  color: var(--color-error);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-}
-
 .itemList {
   display: flex;
   flex-direction: column;

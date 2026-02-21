@@ -178,44 +178,6 @@ describe("PATCH /api/items/:listId/:itemId", () => {
   });
 });
 
-describe("DELETE /api/items/:listId/checked", () => {
-  it("soft-deletes all checked items", async () => {
-    // Create items
-    const res1 = await app.request(
-      `/api/items/${listId}`,
-      req({ method: "POST", body: { text: "Checked" } }),
-      env,
-    );
-    const { id: itemId1 } = await res1.json();
-    await app.request(
-      `/api/items/${listId}`,
-      req({ method: "POST", body: { text: "Unchecked" } }),
-      env,
-    );
-
-    // Check the first item
-    await app.request(
-      `/api/items/${listId}/${itemId1}`,
-      req({ method: "PATCH", body: { checked: true } }),
-      env,
-    );
-
-    // Delete checked
-    const delRes = await app.request(
-      `/api/items/${listId}/checked`,
-      req({ method: "DELETE" }),
-      env,
-    );
-    expect(delRes.status).toBe(200);
-
-    // Verify only unchecked remains
-    const listRes = await app.request(`/api/items/${listId}`, req(), env);
-    const items = await listRes.json();
-    expect(items).toHaveLength(1);
-    expect(items[0].text).toBe("Unchecked");
-  });
-});
-
 describe("PUT /api/items/:listId/reorder", () => {
   it("updates item positions", async () => {
     const res1 = await app.request(
