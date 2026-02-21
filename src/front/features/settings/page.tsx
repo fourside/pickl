@@ -21,9 +21,7 @@ export function SettingsPage() {
   // Avatar state
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState(
-    user?.hasAvatar ? `/api/avatar/${user.id}` : null,
-  );
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl ?? null);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFileSelect = useCallback(
@@ -47,9 +45,9 @@ export function SettingsPage() {
       setIsUploading(true);
       try {
         await uploadAvatar(blob);
-        updateUser({ hasAvatar: true });
-        // Bust cache by appending timestamp
-        setAvatarUrl(`/api/avatar/${user?.id}?t=${Date.now()}`);
+        const newUrl = `/api/avatar/${user?.id}?t=${Date.now()}`;
+        updateUser({ avatarUrl: newUrl });
+        setAvatarUrl(newUrl);
       } catch {
         // upload failed — keep current avatar display
       } finally {

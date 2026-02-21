@@ -12,7 +12,7 @@ interface AuthUser {
   id: string;
   name: string;
   email: string;
-  hasAvatar: boolean;
+  avatarUrl: string | null;
 }
 
 interface AuthContextValue {

@@ -48,6 +48,9 @@ describe("POST /api/lists", () => {
     expect(body.name).toBe("Groceries");
     expect(body.createdBy).toBe("user-1");
     expect(body.isParticipant).toBe(true);
+    expect(body.participants).toEqual([
+      { id: "user-1", name: "Test User", avatarUrl: null },
+    ]);
   });
 
   it("returns 400 on invalid body", async () => {
@@ -69,6 +72,9 @@ describe("GET /api/lists", () => {
     expect(body).toHaveLength(1);
     expect(body[0].name).toBe("My List");
     expect(body[0].isParticipant).toBe(true);
+    expect(body[0].participants).toEqual([
+      { id: "user-1", name: "Test User", avatarUrl: null },
+    ]);
   });
 });
 

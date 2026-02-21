@@ -23,7 +23,7 @@ export function TestWrapper({
         id: "user-1",
         name: "Test User",
         email: "test@example.com",
-        hasAvatar: false,
+        avatarUrl: null,
       }),
     );
   } else {

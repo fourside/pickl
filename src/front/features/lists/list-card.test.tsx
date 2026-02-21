@@ -11,6 +11,7 @@ const baseList: ListItem = {
   createdAt: "2025-01-01T00:00:00Z",
   updatedAt: "2025-01-01T00:00:00Z",
   isParticipant: true,
+  participants: [{ id: "user-1", name: "Test User", avatarUrl: null }],
 };
 
 describe("ListCard", () => {

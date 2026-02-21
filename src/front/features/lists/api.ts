@@ -1,5 +1,11 @@
 import { apiFetch } from "../../shared/api/client";
 
+export interface Participant {
+  id: string;
+  name: string;
+  avatarUrl: string | null;
+}
+
 export interface ListItem {
   id: string;
   name: string;
@@ -7,6 +13,7 @@ export interface ListItem {
   createdAt: string;
   updatedAt: string;
   isParticipant: boolean;
+  participants: Participant[];
 }
 
 export function createList(name: string): Promise<ListItem> {

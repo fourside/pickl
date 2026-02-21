@@ -47,7 +47,7 @@ authRoutes.post("/login", async (c) => {
       id: user.id,
       name: user.name,
       email: user.email,
-      hasAvatar: !!user.avatar_key,
+      avatarUrl: user.avatar_key ? `/api/avatar/${user.id}` : null,
     },
   });
 });

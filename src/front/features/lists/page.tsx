@@ -28,12 +28,8 @@ export function ListsPage() {
           className={styles.avatarLink}
           aria-label="Settings"
         >
-          {user?.hasAvatar ? (
-            <img
-              src={`/api/avatar/${user.id}`}
-              alt=""
-              className={styles.avatarImage}
-            />
+          {user?.avatarUrl ? (
+            <img src={user.avatarUrl} alt="" className={styles.avatarImage} />
           ) : (
             <span className={styles.avatarPlaceholder}>
               {user?.name?.charAt(0).toUpperCase() ?? "?"}

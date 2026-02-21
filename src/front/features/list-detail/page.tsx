@@ -208,6 +208,22 @@ export function ListDetailPage() {
             {list?.name ?? "..."}
           </h1>
         )}
+        <div className={styles.headerAvatars}>
+          {list?.participants.map((p) =>
+            p.avatarUrl ? (
+              <img
+                key={p.id}
+                src={p.avatarUrl}
+                alt={p.name}
+                className={styles.headerAvatar}
+              />
+            ) : (
+              <span key={p.id} className={styles.headerAvatarPlaceholder}>
+                {p.name.charAt(0).toUpperCase()}
+              </span>
+            ),
+          )}
+        </div>
       </div>
 
       {!isParticipant && (

@@ -31,6 +31,36 @@ listsRoutes.get("/", async (c) => {
     .orderBy("lists.updated_at", "desc")
     .execute();
 
+  const listIds = lists.map((l) => l.id);
+  const participants =
+    listIds.length > 0
+      ? await db
+          .selectFrom("list_participants")
+          .innerJoin("users", "users.id", "list_participants.user_id")
+          .select([
+            "list_participants.list_id",
+            "users.id",
+            "users.name",
+            "users.avatar_key",
+          ])
+          .where("list_participants.list_id", "in", listIds)
+          .execute()
+      : [];
+
+  const participantsByList = new Map<
+    string,
+    { id: string; name: string; avatarUrl: string | null }[]
+  >();
+  for (const p of participants) {
+    const list = participantsByList.get(p.list_id) ?? [];
+    list.push({
+      id: p.id,
+      name: p.name,
+      avatarUrl: p.avatar_key ? `/api/avatar/${p.id}` : null,
+    });
+    participantsByList.set(p.list_id, list);
+  }
+
   return c.json(
     lists.map((list) => ({
       id: list.id,
@@ -39,6 +69,7 @@ listsRoutes.get("/", async (c) => {
       createdAt: list.created_at,
       updatedAt: list.updated_at,
       isParticipant: list.participant_user_id !== null,
+      participants: participantsByList.get(list.id) ?? [],
     })),
   );
 });
@@ -76,6 +107,12 @@ listsRoutes.post("/", async (c) => {
     })
     .execute();
 
+  const creator = await db
+    .selectFrom("users")
+    .select(["name", "avatar_key"])
+    .where("id", "=", userId)
+    .executeTakeFirstOrThrow();
+
   return c.json(
     {
       id,
@@ -84,6 +121,13 @@ listsRoutes.post("/", async (c) => {
       createdAt: now,
       updatedAt: now,
       isParticipant: true,
+      participants: [
+        {
+          id: userId,
+          name: creator.name,
+          avatarUrl: creator.avatar_key ? `/api/avatar/${userId}` : null,
+        },
+      ],
     },
     201,
   );

@@ -8,7 +8,7 @@ const testUser = {
   id: "user-1",
   name: "Test User",
   email: "test@example.com",
-  hasAvatar: false,
+  avatarUrl: null,
 };
 
 export const testLists: ListItem[] = [
@@ -19,6 +19,7 @@ export const testLists: ListItem[] = [
     createdAt: now,
     updatedAt: now,
     isParticipant: true,
+    participants: [{ id: "user-1", name: "Test User", avatarUrl: null }],
   },
   {
     id: "list-2",
@@ -27,6 +28,7 @@ export const testLists: ListItem[] = [
     createdAt: now,
     updatedAt: now,
     isParticipant: false,
+    participants: [{ id: "user-2", name: "Other User", avatarUrl: null }],
   },
 ];
 
@@ -98,6 +100,7 @@ export const handlers = [
       createdAt: now,
       updatedAt: now,
       isParticipant: true,
+      participants: [{ id: "user-1", name: "Test User", avatarUrl: null }],
     };
     return HttpResponse.json(newList);
   }),
