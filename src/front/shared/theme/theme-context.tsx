@@ -9,8 +9,8 @@ import {
 type ThemePreference = "system" | "light" | "dark";
 
 interface ThemeContextValue {
-  preference: ThemePreference;
-  setPreference: (pref: ThemePreference) => void;
+  isDark: boolean;
+  toggleDark: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -19,25 +19,22 @@ const STORAGE_KEY = "theme-preference";
 
 function getStoredPreference(): ThemePreference {
   const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === "light" || stored === "dark" || stored === "system") {
+  if (stored === "light" || stored === "dark") {
     return stored;
   }
   return "system";
 }
 
-function applyTheme(preference: ThemePreference) {
-  const root = document.documentElement;
-  if (preference === "system") {
-    root.removeAttribute("data-theme");
-  } else {
-    root.setAttribute("data-theme", preference);
-  }
+function resolveIsDark(preference: ThemePreference): boolean {
+  if (preference === "dark") return true;
+  if (preference === "light") return false;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
 
-  // Update theme-color meta tag
-  const isDark =
-    preference === "dark" ||
-    (preference === "system" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches);
+function applyTheme(isDark: boolean) {
+  const root = document.documentElement;
+  root.setAttribute("data-theme", isDark ? "dark" : "light");
+
   const metaThemeColor = document.querySelector('meta[name="theme-color"]');
   if (metaThemeColor) {
     metaThemeColor.setAttribute("content", isDark ? "#0f172a" : "#0d2137");
@@ -45,21 +42,25 @@ function applyTheme(preference: ThemePreference) {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [preference, setPreferenceState] =
-    useState<ThemePreference>(getStoredPreference);
+  const [isDark, setIsDark] = useState(() =>
+    resolveIsDark(getStoredPreference()),
+  );
 
-  const setPreference = useCallback((pref: ThemePreference) => {
-    localStorage.setItem(STORAGE_KEY, pref);
-    setPreferenceState(pref);
-    applyTheme(pref);
+  const toggleDark = useCallback(() => {
+    setIsDark((prev) => {
+      const next = !prev;
+      localStorage.setItem(STORAGE_KEY, next ? "dark" : "light");
+      applyTheme(next);
+      return next;
+    });
   }, []);
 
   useEffect(() => {
-    applyTheme(preference);
-  }, [preference]);
+    applyTheme(isDark);
+  }, [isDark]);
 
   return (
-    <ThemeContext.Provider value={{ preference, setPreference }}>
+    <ThemeContext.Provider value={{ isDark, toggleDark }}>
       {children}
     </ThemeContext.Provider>
   );

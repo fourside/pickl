@@ -68,28 +68,3 @@ textarea {
 
   --shadow-md: 0 4px 12px rgb(0 0 0 / 0.4);
 }
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --color-background: #0f172a;
-    --color-text: #e2e8f0;
-    --color-on-primary: #ffffff;
-
-    --color-primary: #3b82f6;
-    --color-primary-light: #1e3a5f;
-
-    --color-surface: #1e293b;
-    --color-surface-active: #334155;
-    --color-border: #475569;
-    --color-border-light: #334155;
-    --color-text-muted: #64748b;
-    --color-text-secondary: #94a3b8;
-
-    --color-error: #ef4444;
-    --color-error-light: #450a0a;
-    --color-success: #22c55e;
-    --color-warning-light: #422006;
-
-    --shadow-md: 0 4px 12px rgb(0 0 0 / 0.4);
-  }
-}

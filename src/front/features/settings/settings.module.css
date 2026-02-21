@@ -34,15 +34,43 @@
   margin-bottom: 0.75rem;
 }
 
-.themeSelect {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: 16px;
-  background: var(--color-surface);
-  color: var(--color-text);
-  font-family: inherit;
+.themeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+.switch {
+  width: 44px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--color-border);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.switch[data-checked] {
+  background: var(--color-primary);
+}
+
+.switchThumb {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-on-primary);
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.15s ease;
+}
+
+.switch[data-checked] .switchThumb {
+  transform: translateX(20px);
 }
 
 .form {
