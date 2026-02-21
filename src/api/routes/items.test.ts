@@ -41,10 +41,7 @@ beforeEach(async () => {
   listId = body.id;
 });
 
-function req(
-  path: string,
-  opts?: { method?: string; body?: object },
-): RequestInit {
+function req(opts?: { method?: string; body?: object }): RequestInit {
   return {
     method: opts?.method ?? "GET",
     headers: {
@@ -59,7 +56,7 @@ describe("POST /api/items/:listId", () => {
   it("creates an item with auto-incremented position", async () => {
     const res1 = await app.request(
       `/api/items/${listId}`,
-      req("", { method: "POST", body: { text: "Apples" } }),
+      req({ method: "POST", body: { text: "Apples" } }),
       env,
     );
     expect(res1.status).toBe(201);
@@ -69,7 +66,7 @@ describe("POST /api/items/:listId", () => {
 
     const res2 = await app.request(
       `/api/items/${listId}`,
-      req("", { method: "POST", body: { text: "Bananas" } }),
+      req({ method: "POST", body: { text: "Bananas" } }),
       env,
     );
     const item2 = await res2.json();
@@ -116,12 +113,12 @@ describe("GET /api/items/:listId", () => {
     // Create two items
     await app.request(
       `/api/items/${listId}`,
-      req("", { method: "POST", body: { text: "Keep" } }),
+      req({ method: "POST", body: { text: "Keep" } }),
       env,
     );
     const res2 = await app.request(
       `/api/items/${listId}`,
-      req("", { method: "POST", body: { text: "Delete me" } }),
+      req({ method: "POST", body: { text: "Delete me" } }),
       env,
     );
     const { id: deleteId } = await res2.json();
@@ -129,12 +126,12 @@ describe("GET /api/items/:listId", () => {
     // Soft delete the second item
     await app.request(
       `/api/items/${listId}/${deleteId}`,
-      req("", { method: "DELETE" }),
+      req({ method: "DELETE" }),
       env,
     );
 
     // Get items
-    const res = await app.request(`/api/items/${listId}`, req(""), env);
+    const res = await app.request(`/api/items/${listId}`, req(), env);
     const items = await res.json();
 
     expect(items).toHaveLength(1);
@@ -146,14 +143,14 @@ describe("PATCH /api/items/:listId/:itemId", () => {
   it("updates item text", async () => {
     const createRes = await app.request(
       `/api/items/${listId}`,
-      req("", { method: "POST", body: { text: "Old" } }),
+      req({ method: "POST", body: { text: "Old" } }),
       env,
     );
     const { id: itemId } = await createRes.json();
 
     const res = await app.request(
       `/api/items/${listId}/${itemId}`,
-      req("", { method: "PATCH", body: { text: "New" } }),
+      req({ method: "PATCH", body: { text: "New" } }),
       env,
     );
 
@@ -165,14 +162,14 @@ describe("PATCH /api/items/:listId/:itemId", () => {
   it("toggles checked status", async () => {
     const createRes = await app.request(
       `/api/items/${listId}`,
-      req("", { method: "POST", body: { text: "Item" } }),
+      req({ method: "POST", body: { text: "Item" } }),
       env,
     );
     const { id: itemId } = await createRes.json();
 
     const res = await app.request(
       `/api/items/${listId}/${itemId}`,
-      req("", { method: "PATCH", body: { checked: true } }),
+      req({ method: "PATCH", body: { checked: true } }),
       env,
     );
 
@@ -187,33 +184,33 @@ describe("DELETE /api/items/:listId/checked", () => {
     // Create items
     const res1 = await app.request(
       `/api/items/${listId}`,
-      req("", { method: "POST", body: { text: "Checked" } }),
+      req({ method: "POST", body: { text: "Checked" } }),
       env,
     );
     const { id: itemId1 } = await res1.json();
     await app.request(
       `/api/items/${listId}`,
-      req("", { method: "POST", body: { text: "Unchecked" } }),
+      req({ method: "POST", body: { text: "Unchecked" } }),
       env,
     );
 
     // Check the first item
     await app.request(
       `/api/items/${listId}/${itemId1}`,
-      req("", { method: "PATCH", body: { checked: true } }),
+      req({ method: "PATCH", body: { checked: true } }),
       env,
     );
 
     // Delete checked
     const delRes = await app.request(
       `/api/items/${listId}/checked`,
-      req("", { method: "DELETE" }),
+      req({ method: "DELETE" }),
       env,
     );
     expect(delRes.status).toBe(200);
 
     // Verify only unchecked remains
-    const listRes = await app.request(`/api/items/${listId}`, req(""), env);
+    const listRes = await app.request(`/api/items/${listId}`, req(), env);
     const items = await listRes.json();
     expect(items).toHaveLength(1);
     expect(items[0].text).toBe("Unchecked");
@@ -224,12 +221,12 @@ describe("PUT /api/items/:listId/reorder", () => {
   it("updates item positions", async () => {
     const res1 = await app.request(
       `/api/items/${listId}`,
-      req("", { method: "POST", body: { text: "A" } }),
+      req({ method: "POST", body: { text: "A" } }),
       env,
     );
     const res2 = await app.request(
       `/api/items/${listId}`,
-      req("", { method: "POST", body: { text: "B" } }),
+      req({ method: "POST", body: { text: "B" } }),
       env,
     );
     const { id: idA } = await res1.json();
@@ -238,13 +235,13 @@ describe("PUT /api/items/:listId/reorder", () => {
     // Reorder: B before A
     const reorderRes = await app.request(
       `/api/items/${listId}/reorder`,
-      req("", { method: "PUT", body: { itemIds: [idB, idA] } }),
+      req({ method: "PUT", body: { itemIds: [idB, idA] } }),
       env,
     );
     expect(reorderRes.status).toBe(200);
 
     // Verify order
-    const listRes = await app.request(`/api/items/${listId}`, req(""), env);
+    const listRes = await app.request(`/api/items/${listId}`, req(), env);
     const items = await listRes.json();
     expect(items[0].text).toBe("B");
     expect(items[1].text).toBe("A");

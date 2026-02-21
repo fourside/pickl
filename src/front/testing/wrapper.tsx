@@ -34,7 +34,9 @@ export function TestWrapper({
     <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
       <AuthProvider>
         <ThemeProvider>
-          <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
+          <MemoryRouter initialEntries={initialEntries}>
+            {children}
+          </MemoryRouter>
         </ThemeProvider>
       </AuthProvider>
     </SWRConfig>
