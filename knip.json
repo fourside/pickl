@@ -4,5 +4,5 @@
     "src/front/sw.ts",
     "src/models/push-subscription.ts"
   ],
-  "ignoreDependencies": ["cloudflare", "workbox-precaching", "vite-plugin-pwa"]
+  "ignoreDependencies": ["cloudflare", "workbox-core", "workbox-precaching"]
 }

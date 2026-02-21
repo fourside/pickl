@@ -1,6 +1,11 @@
+import { clientsClaim } from "workbox-core";
 import { precacheAndRoute } from "workbox-precaching";
 
 declare const self: ServiceWorkerGlobalScope;
+
+// Activate new SW immediately without waiting for old clients to close
+self.skipWaiting();
+clientsClaim();
 
 // Precache static assets injected by vite-plugin-pwa
 precacheAndRoute(self.__WB_MANIFEST);
