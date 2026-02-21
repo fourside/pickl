@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../../shared/auth/auth-context";
+import { useTheme } from "../../shared/theme/theme-context";
 import { changePassword } from "./api";
 import styles from "./settings.module.css";
 
 export function SettingsPage() {
   const { user, logout } = useAuth();
+  const { preference, setPreference } = useTheme();
   const navigate = useNavigate();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -51,6 +53,21 @@ export function SettingsPage() {
         <p className={styles.userInfo}>
           {user?.name} ({user?.email})
         </p>
+      </div>
+
+      <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>Theme</h2>
+        <select
+          className={styles.themeSelect}
+          value={preference}
+          onChange={(e) =>
+            setPreference(e.target.value as "system" | "light" | "dark")
+          }
+        >
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
       </div>
 
       <div className={styles.section}>
