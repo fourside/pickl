@@ -12,6 +12,8 @@ npm run test:api      # API integration tests (vitest, cloudflare workers pool)
 npm run test:all      # Both test suites sequentially
 npm run lint          # Biome check (lint + format)
 npm run lint:fix      # Biome auto-fix
+npm run knip          # Find unused files, dependencies, and exports
+npm run knip:fix      # Auto-fix knip issues
 npm run deploy        # wrangler deploy to Cloudflare Workers
 npm run ladle         # Component development server (Ladle)
 ```
@@ -37,7 +39,7 @@ Both `src/api/` and `src/front/` import from `src/models/` but never from each o
 
 Each feature is a self-contained directory under `src/front/features/` containing its page component, API client (`api.ts`), CSS Module, tests, and stories. Shared code lives in `src/front/shared/` (auth context, API client wrapper, reusable components).
 
-- **Data fetching**: SWR with 3-second polling; optimistic updates via `mutate`
+- **Data fetching**: SWR with 30-second polling; optimistic updates via `mutate`
 - **Routing**: React Router v7 library mode — `/login`, `/`, `/lists/:id`, `/settings`
 - **Auth**: JWT stored in localStorage, `AuthContext` provides user state, `AuthGuard` protects routes
 - **Styling**: CSS Modules (`.module.css`), no utility framework
