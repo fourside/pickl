@@ -56,6 +56,15 @@ Each feature is a self-contained directory under `src/front/features/` containin
 - **Frontend/models tests** (`vitest.config.ts`): jsdom environment, MSW for API mocking, React Testing Library. Setup in `src/front/test-setup.ts`. Test wrapper in `src/front/testing/wrapper.tsx` provides router + auth + SWR context.
 - **API tests** (`vitest.config.workers.ts`): `@cloudflare/vitest-pool-workers` runs tests against real D1 via wrangler config.
 
+## Deploy
+
+- `npm run build && npm run deploy` でデプロイする（`dist/` を消した場合は先にビルドが必要）
+- `JWT_SECRET` はローカル開発用が `.dev.vars` にあり、本番では暗号化シークレットとして設定する
+  ```bash
+  npx wrangler secret put JWT_SECRET <<< $(node -e "console.log(crypto.randomUUID())")
+  ```
+- シークレットはデプロイ前に設定しておくのが望ましい
+
 ## Conventions
 
 - Biome for linting and formatting (2-space indent, organized imports)
