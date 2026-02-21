@@ -1,6 +1,6 @@
 import * as v from "valibot";
 
-export type List = {
+type List = {
   id: string;
   name: string;
   createdBy: string;
@@ -19,15 +19,7 @@ export const ListSchema = v.object({
 export const CreateListRequestSchema = v.object({
   name: v.pipe(v.string(), v.nonEmpty()),
 });
-export type CreateListRequest = v.InferOutput<typeof CreateListRequestSchema>;
 
 export const UpdateListRequestSchema = v.object({
   name: v.pipe(v.string(), v.nonEmpty()),
 });
-export type UpdateListRequest = v.InferOutput<typeof UpdateListRequestSchema>;
-
-export type ListParticipant = {
-  listId: string;
-  userId: string;
-  joinedAt: string;
-};

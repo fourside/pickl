@@ -1,6 +1,6 @@
 import * as v from "valibot";
 
-export type Item = {
+type Item = {
   id: string;
   listId: string;
   text: string;
@@ -31,17 +31,12 @@ export const ItemSchema = v.object({
 export const CreateItemRequestSchema = v.object({
   text: v.pipe(v.string(), v.nonEmpty()),
 });
-export type CreateItemRequest = v.InferOutput<typeof CreateItemRequestSchema>;
 
 export const UpdateItemRequestSchema = v.object({
   text: v.optional(v.pipe(v.string(), v.nonEmpty())),
   checked: v.optional(v.boolean()),
 });
-export type UpdateItemRequest = v.InferOutput<typeof UpdateItemRequestSchema>;
 
 export const ReorderItemsRequestSchema = v.object({
   itemIds: v.pipe(v.array(v.string()), v.nonEmpty()),
 });
-export type ReorderItemsRequest = v.InferOutput<
-  typeof ReorderItemsRequestSchema
->;

@@ -1,6 +1,6 @@
 import * as v from "valibot";
 
-export type User = {
+type User = {
   id: string;
   email: string;
   passwordHash: string;
@@ -24,12 +24,8 @@ export const LoginRequestSchema = v.object({
   email: v.pipe(v.string(), v.email()),
   password: v.pipe(v.string(), v.nonEmpty()),
 });
-export type LoginRequest = v.InferOutput<typeof LoginRequestSchema>;
 
 export const ChangePasswordRequestSchema = v.object({
   currentPassword: v.pipe(v.string(), v.nonEmpty()),
   newPassword: v.pipe(v.string(), v.minLength(8)),
 });
-export type ChangePasswordRequest = v.InferOutput<
-  typeof ChangePasswordRequestSchema
->;

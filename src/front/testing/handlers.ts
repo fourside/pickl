@@ -4,7 +4,7 @@ import type { ListItem } from "../features/lists/api";
 
 const now = new Date().toISOString();
 
-export const testUser = {
+const testUser = {
   id: "user-1",
   name: "Test User",
   email: "test@example.com",
@@ -30,7 +30,7 @@ export const testLists: ListItem[] = [
   },
 ];
 
-export const testItems: ItemData[] = [
+const testItems: ItemData[] = [
   {
     id: "item-1",
     listId: "list-1",

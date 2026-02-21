@@ -13,10 +13,6 @@ export interface ItemData {
   updatedAt: string;
 }
 
-export function fetchItems(listId: string): Promise<ItemData[]> {
-  return apiFetch<ItemData[]>(`/items/${listId}`);
-}
-
 export function createItem(listId: string, text: string): Promise<ItemData> {
   return apiFetch<ItemData>(`/items/${listId}`, {
     method: "POST",
