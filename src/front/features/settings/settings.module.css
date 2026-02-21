@@ -2,6 +2,8 @@
   padding: env(safe-area-inset-top, 0) 1rem env(safe-area-inset-bottom, 0);
   max-width: 600px;
   margin: 0 auto;
+  min-height: 100dvh;
+  -webkit-overflow-scrolling: touch;
 }
 
 .header {
