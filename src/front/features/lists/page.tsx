@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { Link } from "react-router";
 import useSWR from "swr";
 import { swrFetcher } from "../../shared/api/client";
-import { SettingsIcon } from "../../shared/components/icons";
+import { useAuth } from "../../shared/auth/auth-context";
 import { InputBar } from "../../shared/components/input-bar";
 import type { ListItem } from "./api";
 import { createList } from "./api";
@@ -9,9 +10,11 @@ import { ListCard } from "./list-card";
 import styles from "./lists.module.css";
 
 export function ListsPage() {
+  const { user } = useAuth();
   const { data: lists, mutate } = useSWR<ListItem[]>("/lists", swrFetcher, {
     refreshInterval: 3000,
   });
+  const [avatarError, setAvatarError] = useState(false);
 
   const handleCreate = async (name: string) => {
     const newList = await createList(name);
@@ -24,10 +27,21 @@ export function ListsPage() {
         <h1>Pickl</h1>
         <Link
           to="/settings"
-          className={styles.settingsLink}
+          className={styles.avatarLink}
           aria-label="Settings"
         >
-          <SettingsIcon />
+          {user && !avatarError ? (
+            <img
+              src={`/api/avatar/${user.id}`}
+              alt=""
+              className={styles.avatarImage}
+              onError={() => setAvatarError(true)}
+            />
+          ) : (
+            <span className={styles.avatarPlaceholder}>
+              {user?.name?.charAt(0).toUpperCase() ?? "?"}
+            </span>
+          )}
         </Link>
       </div>
 
