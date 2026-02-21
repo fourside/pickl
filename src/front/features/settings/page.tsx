@@ -9,7 +9,7 @@ import { AvatarCropper } from "./avatar-cropper";
 import styles from "./settings.module.css";
 
 export function SettingsPage() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const { isDark, toggleDark } = useTheme();
   const navigate = useNavigate();
   const [currentPassword, setCurrentPassword] = useState("");
@@ -22,9 +22,8 @@ export function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(
-    user ? `/api/avatar/${user.id}` : null,
+    user?.hasAvatar ? `/api/avatar/${user.id}` : null,
   );
-  const [avatarError, setAvatarError] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFileSelect = useCallback(
@@ -48,16 +47,16 @@ export function SettingsPage() {
       setIsUploading(true);
       try {
         await uploadAvatar(blob);
+        updateUser({ hasAvatar: true });
         // Bust cache by appending timestamp
         setAvatarUrl(`/api/avatar/${user?.id}?t=${Date.now()}`);
-        setAvatarError(false);
       } catch {
-        setAvatarError(true);
+        // upload failed — keep current avatar display
       } finally {
         setIsUploading(false);
       }
     },
-    [user?.id],
+    [user?.id, updateUser],
   );
 
   const handleChangePassword = async (e: React.FormEvent) => {
@@ -102,12 +101,11 @@ export function SettingsPage() {
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
           >
-            {avatarUrl && !avatarError ? (
+            {avatarUrl ? (
               <img
                 src={avatarUrl}
                 alt="Avatar"
                 className={styles.avatarImage}
-                onError={() => setAvatarError(true)}
               />
             ) : (
               <span className={styles.avatarPlaceholder}>

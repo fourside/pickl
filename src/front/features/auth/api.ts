@@ -2,7 +2,7 @@ import { apiFetch } from "../../shared/api/client";
 
 interface LoginResponse {
   token: string;
-  user: { id: string; name: string; email: string };
+  user: { id: string; name: string; email: string; hasAvatar: boolean };
 }
 
 export function login(email: string, password: string): Promise<LoginResponse> {

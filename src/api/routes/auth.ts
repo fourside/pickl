@@ -26,7 +26,7 @@ authRoutes.post("/login", async (c) => {
 
   const user = await db
     .selectFrom("users")
-    .select(["id", "password_hash", "name", "email"])
+    .select(["id", "password_hash", "name", "email", "avatar_key"])
     .where("email", "=", email)
     .executeTakeFirst();
 
@@ -43,7 +43,12 @@ authRoutes.post("/login", async (c) => {
 
   return c.json({
     token,
-    user: { id: user.id, name: user.name, email: user.email },
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      hasAvatar: !!user.avatar_key,
+    },
   });
 });
 

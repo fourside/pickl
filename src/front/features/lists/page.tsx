@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router";
 import useSWR from "swr";
 import { swrFetcher } from "../../shared/api/client";
@@ -14,7 +13,6 @@ export function ListsPage() {
   const { data: lists, mutate } = useSWR<ListItem[]>("/lists", swrFetcher, {
     refreshInterval: 3000,
   });
-  const [avatarError, setAvatarError] = useState(false);
 
   const handleCreate = async (name: string) => {
     const newList = await createList(name);
@@ -30,12 +28,11 @@ export function ListsPage() {
           className={styles.avatarLink}
           aria-label="Settings"
         >
-          {user && !avatarError ? (
+          {user?.hasAvatar ? (
             <img
               src={`/api/avatar/${user.id}`}
               alt=""
               className={styles.avatarImage}
-              onError={() => setAvatarError(true)}
             />
           ) : (
             <span className={styles.avatarPlaceholder}>
