@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router";
 import { SWRConfig } from "swr";
 import { AuthProvider } from "../shared/auth/auth-context";
+import { ThemeProvider } from "../shared/theme/theme-context";
 
 interface TestWrapperProps {
   children: ReactNode;
@@ -32,7 +33,9 @@ export function TestWrapper({
   return (
     <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
       <AuthProvider>
-        <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
+        <ThemeProvider>
+          <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
+        </ThemeProvider>
       </AuthProvider>
     </SWRConfig>
   );

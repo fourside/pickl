@@ -8,6 +8,7 @@ export interface Database {
     password_hash: string;
     name: string;
     password_changed_at: string;
+    avatar_key: string | null;
     created_at: string;
     updated_at: string;
   };

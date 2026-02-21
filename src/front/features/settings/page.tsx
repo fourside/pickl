@@ -1,9 +1,10 @@
 import { Switch } from "@base-ui/react/switch";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../../shared/auth/auth-context";
 import { useTheme } from "../../shared/theme/theme-context";
-import { changePassword } from "./api";
+import { changePassword, uploadAvatar } from "./api";
+import { AvatarCropper } from "./avatar-cropper";
 import styles from "./settings.module.css";
 
 export function SettingsPage() {
@@ -15,6 +16,48 @@ export function SettingsPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Avatar state
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState(
+    user ? `/api/avatar/${user.id}` : null,
+  );
+  const [avatarError, setAvatarError] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCropSrc(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+      // Reset so same file can be re-selected
+      e.target.value = "";
+    },
+    [],
+  );
+
+  const handleCrop = useCallback(
+    async (blob: Blob) => {
+      setCropSrc(null);
+      setIsUploading(true);
+      try {
+        await uploadAvatar(blob);
+        // Bust cache by appending timestamp
+        setAvatarUrl(`/api/avatar/${user?.id}?t=${Date.now()}`);
+        setAvatarError(false);
+      } catch {
+        setAvatarError(true);
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [user?.id],
+  );
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,9 +94,38 @@ export function SettingsPage() {
       </div>
 
       <div className={styles.section}>
-        <p className={styles.userInfo}>
-          {user?.name} ({user?.email})
-        </p>
+        <div className={styles.avatarSection}>
+          <button
+            type="button"
+            className={styles.avatarButton}
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+          >
+            {avatarUrl && !avatarError ? (
+              <img
+                src={avatarUrl}
+                alt="Avatar"
+                className={styles.avatarImage}
+                onError={() => setAvatarError(true)}
+              />
+            ) : (
+              <span className={styles.avatarPlaceholder}>
+                {user?.name?.charAt(0).toUpperCase() ?? "?"}
+              </span>
+            )}
+          </button>
+          <div>
+            <p className={styles.userName}>{user?.name}</p>
+            <p className={styles.userEmail}>{user?.email}</p>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleFileSelect}
+            hidden
+          />
+        </div>
       </div>
 
       <div className={styles.section}>
@@ -116,6 +188,14 @@ export function SettingsPage() {
           Logout
         </button>
       </div>
+
+      {cropSrc && (
+        <AvatarCropper
+          imageSrc={cropSrc}
+          onCrop={handleCrop}
+          onCancel={() => setCropSrc(null)}
+        />
+      )}
     </div>
   );
 }
