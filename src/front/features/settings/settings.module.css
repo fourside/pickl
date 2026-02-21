@@ -28,6 +28,9 @@
 }
 
 .sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-text-secondary);
@@ -37,11 +40,12 @@
 .themeRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.5rem;
   font-size: 0.875rem;
 }
 
 .switch {
+  margin-left: auto;
   width: 44px;
   height: 24px;
   padding: 0;

@@ -2,6 +2,7 @@ import { Switch } from "@base-ui/react/switch";
 import { useCallback, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../../shared/auth/auth-context";
+import { LockIcon, MoonIcon } from "../../shared/components/icons";
 import { useTheme } from "../../shared/theme/theme-context";
 import { changePassword, uploadAvatar } from "./api";
 import { AvatarCropper } from "./avatar-cropper";
@@ -130,6 +131,7 @@ export function SettingsPage() {
 
       <div className={styles.section}>
         <div className={styles.themeRow}>
+          <MoonIcon />
           <span>Dark mode</span>
           <Switch.Root
             className={styles.switch}
@@ -142,7 +144,10 @@ export function SettingsPage() {
       </div>
 
       <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Change Password</h2>
+        <h2 className={styles.sectionTitle}>
+          <LockIcon />
+          Change Password
+        </h2>
         <form className={styles.form} onSubmit={handleChangePassword}>
           <div className={styles.field}>
             <label htmlFor="current-password">Current Password</label>
