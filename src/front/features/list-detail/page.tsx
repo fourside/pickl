@@ -51,13 +51,13 @@ export function ListDetailPage() {
   const { data: lists, mutate: mutateLists } = useSWR<ListItem[]>(
     "/lists",
     swrFetcher,
-    { refreshInterval: isDragging ? 0 : 3000 },
+    { refreshInterval: isDragging ? 0 : 30000 },
   );
 
   const { data: items, mutate: mutateItems } = useSWR<ItemData[]>(
     listId ? `/items/${listId}` : null,
     swrFetcher,
-    { refreshInterval: isDragging ? 0 : 3000 },
+    { refreshInterval: isDragging ? 0 : 30000 },
   );
 
   const list = lists?.find((l) => l.id === listId);

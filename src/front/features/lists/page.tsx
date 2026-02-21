@@ -11,7 +11,7 @@ import styles from "./lists.module.css";
 export function ListsPage() {
   const { user } = useAuth();
   const { data: lists, mutate } = useSWR<ListItem[]>("/lists", swrFetcher, {
-    refreshInterval: 3000,
+    refreshInterval: 30000,
   });
 
   const handleCreate = async (name: string) => {
