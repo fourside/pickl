@@ -63,7 +63,7 @@ export function ListDetailPage() {
     async (text: string) => {
       if (!listId) return;
       const newItem = await createItem(listId, text);
-      mutateItems((prev) => [...(prev ?? []), newItem], false);
+      mutateItems((prev) => [newItem, ...(prev ?? [])], false);
     },
     [listId, mutateItems],
   );

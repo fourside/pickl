@@ -88,15 +88,15 @@ itemsRoutes.post("/:listId", async (c) => {
   const id = crypto.randomUUID();
   const now = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
 
-  // Get max position
-  const maxPos = await db
+  // Get min position to insert at the top
+  const minPos = await db
     .selectFrom("items")
-    .select(db.fn.max("position").as("max_position"))
+    .select(db.fn.min("position").as("min_position"))
     .where("list_id", "=", listId)
     .where("deleted_at", "is", null)
     .executeTakeFirst();
 
-  const position = (maxPos?.max_position ?? -1) + 1;
+  const position = (minPos?.min_position ?? 1) - 1;
 
   await db
     .insertInto("items")
