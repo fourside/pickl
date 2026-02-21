@@ -14,7 +14,9 @@
   padding: 1rem 0;
   position: sticky;
   top: 0;
-  background: var(--color-surface);
+  background: color-mix(in srgb, var(--color-background) 80%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   z-index: 10;
 }
 
@@ -78,6 +80,7 @@
   border-radius: var(--radius-md);
   font-size: 16px;
   box-sizing: border-box;
+  outline-offset: -2px;
 }
 
 .section {
@@ -96,6 +99,28 @@
   font-weight: 600;
   color: var(--color-text-muted);
   text-transform: uppercase;
+}
+
+.sortButtons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.sortButton,
+.sortButtonActive {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: none;
+  color: var(--color-text-muted);
+}
+
+.sortButtonActive {
+  color: var(--color-primary);
 }
 
 .itemList {
@@ -142,6 +167,34 @@
   text-align: center;
   color: var(--color-text-muted);
   padding: 2rem 0;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.slideIn {
+  animation: slideIn 0.2s ease-out;
+}
+
+.fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slideIn,
+  .fadeIn {
+    animation: none;
+  }
 }
 
 .dragOverlay {

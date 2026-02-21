@@ -12,11 +12,15 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import useSWR from "swr";
 import { swrFetcher } from "../../shared/api/client";
-import { ArrowLeftIcon } from "../../shared/components/icons";
+import {
+  ArrowLeftIcon,
+  ClockIcon,
+  SortAZIcon,
+} from "../../shared/components/icons";
 import { InputBar } from "../../shared/components/input-bar";
 import type { ListItem } from "../lists/api";
 import type { ItemData } from "./api";
@@ -37,7 +41,12 @@ export function ListDetailPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editName, setEditName] = useState("");
+  const [doneSortOrder, setDoneSortOrder] = useState<"newest" | "alphabetical">(
+    "newest",
+  );
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const lastAddedIdRef = useRef<string | null>(null);
+  const lastCheckedIdRef = useRef<string | null>(null);
 
   const { data: lists, mutate: mutateLists } = useSWR<ListItem[]>(
     "/lists",
@@ -55,7 +64,17 @@ export function ListDetailPage() {
   const isParticipant = list?.isParticipant ?? false;
 
   const uncheckedItems = items?.filter((item) => !item.checked) ?? [];
-  const checkedItems = items?.filter((item) => item.checked) ?? [];
+  const checkedItems = useMemo(() => {
+    const checked = items?.filter((item) => item.checked) ?? [];
+    if (doneSortOrder === "alphabetical") {
+      return [...checked].sort((a, b) => a.text.localeCompare(b.text));
+    }
+    return [...checked].sort((a, b) => {
+      const aTime = a.checkedAt ?? "";
+      const bTime = b.checkedAt ?? "";
+      return bTime.localeCompare(aTime);
+    });
+  }, [items, doneSortOrder]);
 
   const sensors = useSensors(
     useSensor(MouseSensor, {
@@ -70,6 +89,7 @@ export function ListDetailPage() {
     async (text: string) => {
       if (!listId) return;
       const newItem = await createItem(listId, text);
+      lastAddedIdRef.current = newItem.id;
       mutateItems((prev) => [newItem, ...(prev ?? [])], false);
     },
     [listId, mutateItems],
@@ -78,6 +98,9 @@ export function ListDetailPage() {
   const handleCheck = useCallback(
     async (itemId: string, checked: boolean) => {
       if (!listId) return;
+      if (checked) {
+        lastCheckedIdRef.current = itemId;
+      }
       mutateItems(
         (prev) =>
           prev?.map((item) =>
@@ -223,6 +246,11 @@ export function ListDetailPage() {
                   key={item.id}
                   item={item}
                   isParticipant={isParticipant}
+                  className={
+                    item.id === lastAddedIdRef.current
+                      ? styles.slideIn
+                      : undefined
+                  }
                   onCheck={handleCheck}
                   onDelete={handleDelete}
                 />
@@ -236,10 +264,45 @@ export function ListDetailPage() {
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionTitle}>Done</span>
+            <div className={styles.sortButtons}>
+              <button
+                type="button"
+                className={
+                  doneSortOrder === "newest"
+                    ? styles.sortButtonActive
+                    : styles.sortButton
+                }
+                onClick={() => setDoneSortOrder("newest")}
+                aria-label="Sort by newest"
+                title="Sort by newest"
+              >
+                <ClockIcon />
+              </button>
+              <button
+                type="button"
+                className={
+                  doneSortOrder === "alphabetical"
+                    ? styles.sortButtonActive
+                    : styles.sortButton
+                }
+                onClick={() => setDoneSortOrder("alphabetical")}
+                aria-label="Sort alphabetically"
+                title="Sort alphabetically"
+              >
+                <SortAZIcon />
+              </button>
+            </div>
           </div>
           <div className={styles.itemList}>
             {checkedItems.map((item) => (
-              <div key={item.id}>
+              <div
+                key={item.id}
+                className={
+                  item.id === lastCheckedIdRef.current
+                    ? styles.fadeIn
+                    : undefined
+                }
+              >
                 <ItemRow
                   item={item}
                   isParticipant={isParticipant}

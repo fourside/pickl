@@ -6,6 +6,7 @@ import { ItemRow } from "./item-row";
 interface SortableItemProps {
   item: ItemData;
   isParticipant: boolean;
+  className?: string;
   onCheck: (itemId: string, checked: boolean) => void;
   onDelete: (itemId: string) => void;
 }
@@ -13,6 +14,7 @@ interface SortableItemProps {
 export function SortableItem({
   item,
   isParticipant,
+  className,
   onCheck,
   onDelete,
 }: SortableItemProps) {
@@ -32,7 +34,13 @@ export function SortableItem({
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={className}
+      {...attributes}
+      {...listeners}
+    >
       <ItemRow
         item={item}
         isParticipant={isParticipant}
