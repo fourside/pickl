@@ -29,7 +29,6 @@ export function SortableItem({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    touchAction: "none",
   };
 
   return (

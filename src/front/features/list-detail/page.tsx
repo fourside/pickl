@@ -2,7 +2,8 @@ import {
   closestCenter,
   DndContext,
   type DragEndEvent,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -58,7 +59,10 @@ export function ListDetailPage() {
   const checkedItems = items?.filter((item) => item.checked) ?? [];
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+    useSensor(TouchSensor, {
       activationConstraint: { delay: 200, tolerance: 5 },
     }),
   );
