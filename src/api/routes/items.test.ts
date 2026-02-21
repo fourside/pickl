@@ -53,7 +53,7 @@ function req(opts?: { method?: string; body?: object }): RequestInit {
 }
 
 describe("POST /api/items/:listId", () => {
-  it("creates an item with auto-incremented position", async () => {
+  it("creates an item with decremented position (newest first)", async () => {
     const res1 = await app.request(
       `/api/items/${listId}`,
       req({ method: "POST", body: { text: "Apples" } }),
@@ -62,7 +62,6 @@ describe("POST /api/items/:listId", () => {
     expect(res1.status).toBe(201);
     const item1 = await res1.json();
     expect(item1.text).toBe("Apples");
-    expect(item1.position).toBe(0);
 
     const res2 = await app.request(
       `/api/items/${listId}`,
@@ -70,7 +69,7 @@ describe("POST /api/items/:listId", () => {
       env,
     );
     const item2 = await res2.json();
-    expect(item2.position).toBe(1);
+    expect(item2.position).toBeLessThan(item1.position);
   });
 
   it("returns 403 for non-participant", async () => {
