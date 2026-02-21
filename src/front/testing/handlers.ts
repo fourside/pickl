@@ -19,6 +19,7 @@ export const testLists: ListItem[] = [
     createdAt: now,
     updatedAt: now,
     isParticipant: true,
+    autoHideDone: true,
     participants: [{ id: "user-1", name: "Test User", avatarUrl: null }],
   },
   {
@@ -28,6 +29,7 @@ export const testLists: ListItem[] = [
     createdAt: now,
     updatedAt: now,
     isParticipant: false,
+    autoHideDone: true,
     participants: [{ id: "user-2", name: "Other User", avatarUrl: null }],
   },
 ];
@@ -100,6 +102,7 @@ export const handlers = [
       createdAt: now,
       updatedAt: now,
       isParticipant: true,
+      autoHideDone: true,
       participants: [{ id: "user-1", name: "Test User", avatarUrl: null }],
     };
     return HttpResponse.json(newList);
@@ -152,6 +155,10 @@ export const handlers = [
 
   http.put("/api/items/:listId/reorder", () => {
     return HttpResponse.json({});
+  }),
+
+  http.patch("/api/lists/:listId", () => {
+    return HttpResponse.json({ ok: true });
   }),
 
   http.post("/api/lists/:listId/join", () => {

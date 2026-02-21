@@ -21,5 +21,6 @@ export const CreateListRequestSchema = v.object({
 });
 
 export const UpdateListRequestSchema = v.object({
-  name: v.pipe(v.string(), v.nonEmpty()),
+  name: v.optional(v.pipe(v.string(), v.nonEmpty())),
+  autoHideDone: v.optional(v.boolean()),
 });

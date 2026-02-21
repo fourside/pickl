@@ -52,3 +52,13 @@ export function updateListName(listId: string, name: string): Promise<void> {
     body: JSON.stringify({ name }),
   });
 }
+
+export function updateListAutoHide(
+  listId: string,
+  autoHideDone: boolean,
+): Promise<void> {
+  return apiFetch(`/lists/${listId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ autoHideDone }),
+  });
+}

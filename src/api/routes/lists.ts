@@ -23,6 +23,7 @@ listsRoutes.get("/", async (c) => {
     .select([
       "lists.id",
       "lists.name",
+      "lists.auto_hide_done",
       "lists.created_by",
       "lists.created_at",
       "lists.updated_at",
@@ -69,6 +70,7 @@ listsRoutes.get("/", async (c) => {
       createdAt: list.created_at,
       updatedAt: list.updated_at,
       isParticipant: list.participant_user_id !== null,
+      autoHideDone: list.auto_hide_done === 1,
       participants: participantsByList.get(list.id) ?? [],
     })),
   );
@@ -121,6 +123,7 @@ listsRoutes.post("/", async (c) => {
       createdAt: now,
       updatedAt: now,
       isParticipant: true,
+      autoHideDone: true,
       participants: [
         {
           id: userId,
@@ -133,7 +136,7 @@ listsRoutes.post("/", async (c) => {
   );
 });
 
-// Update list name
+// Update list
 listsRoutes.patch("/:id", async (c) => {
   const listId = c.req.param("id");
   const userId = c.get("userId");
@@ -158,11 +161,15 @@ listsRoutes.patch("/:id", async (c) => {
 
   const now = new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
 
-  await db
-    .updateTable("lists")
-    .set({ name: result.output.name, updated_at: now })
-    .where("id", "=", listId)
-    .execute();
+  const updates: Record<string, unknown> = { updated_at: now };
+  if (result.output.name !== undefined) {
+    updates.name = result.output.name;
+  }
+  if (result.output.autoHideDone !== undefined) {
+    updates.auto_hide_done = result.output.autoHideDone ? 1 : 0;
+  }
+
+  await db.updateTable("lists").set(updates).where("id", "=", listId).execute();
 
   return c.json({ ok: true });
 });

@@ -1,3 +1,4 @@
+import { Menu } from "@base-ui/react/menu";
 import {
   closestCenter,
   DndContext,
@@ -19,6 +20,7 @@ import { swrFetcher } from "../../shared/api/client";
 import {
   ArrowLeftIcon,
   ClockIcon,
+  MoreVerticalIcon,
   SortAZIcon,
 } from "../../shared/components/icons";
 import { InputBar } from "../../shared/components/input-bar";
@@ -30,6 +32,7 @@ import {
   joinList,
   reorderItems,
   updateItem,
+  updateListAutoHide,
   updateListName,
 } from "./api";
 import { ItemRow } from "./item-row";
@@ -152,6 +155,23 @@ export function ListDetailPage() {
     mutateLists();
   }, [listId, editName, list?.name, mutateLists]);
 
+  const handleToggleAutoHide = useCallback(
+    async (checked: boolean) => {
+      if (!listId) return;
+      mutateLists(
+        (prev) =>
+          prev?.map((l) =>
+            l.id === listId ? { ...l, autoHideDone: checked } : l,
+          ),
+        false,
+      );
+      await updateListAutoHide(listId, checked);
+      mutateLists();
+      mutateItems();
+    },
+    [listId, mutateLists, mutateItems],
+  );
+
   const handleDragEnd = useCallback(
     async (event: DragEndEvent) => {
       setIsDragging(false);
@@ -224,6 +244,39 @@ export function ListDetailPage() {
             ),
           )}
         </div>
+        {isParticipant && (
+          <Menu.Root>
+            <Menu.Trigger
+              className={styles.menuTrigger}
+              aria-label="List settings"
+            >
+              <MoreVerticalIcon />
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner
+                side="bottom"
+                align="end"
+                sideOffset={4}
+                positionMethod="fixed"
+                className={styles.menuPositioner}
+              >
+                <Menu.Popup className={styles.menuPopup}>
+                  <Menu.CheckboxItem
+                    className={styles.menuCheckboxItem}
+                    checked={list?.autoHideDone ?? true}
+                    onCheckedChange={handleToggleAutoHide}
+                    closeOnClick={false}
+                  >
+                    <Menu.CheckboxItemIndicator
+                      className={styles.menuItemIndicator}
+                    />
+                    48時間後に非表示
+                  </Menu.CheckboxItem>
+                </Menu.Popup>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
+        )}
       </div>
 
       {!isParticipant && (

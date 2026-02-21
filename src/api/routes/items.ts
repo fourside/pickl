@@ -36,24 +36,33 @@ itemsRoutes.get("/:listId", async (c) => {
   const listId = c.req.param("listId");
   const db = c.get("db");
 
-  const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000)
-    .toISOString()
-    .replace(/\.\d{3}Z$/, "Z");
+  const list = await db
+    .selectFrom("lists")
+    .select("auto_hide_done")
+    .where("id", "=", listId)
+    .executeTakeFirst();
 
-  const items = await db
+  let query = db
     .selectFrom("items")
     .selectAll()
     .where("list_id", "=", listId)
-    .where("deleted_at", "is", null)
-    .where((eb) =>
+    .where("deleted_at", "is", null);
+
+  if (list?.auto_hide_done) {
+    const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000)
+      .toISOString()
+      .replace(/\.\d{3}Z$/, "Z");
+
+    query = query.where((eb) =>
       eb.or([
         eb("checked", "=", 0),
         eb("checked_at", "is", null),
         eb("checked_at", ">=", fortyEightHoursAgo),
       ]),
-    )
-    .orderBy("position", "asc")
-    .execute();
+    );
+  }
+
+  const items = await query.orderBy("position", "asc").execute();
 
   return c.json(
     items.map((item) => ({

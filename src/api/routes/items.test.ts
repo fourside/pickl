@@ -178,6 +178,51 @@ describe("PATCH /api/items/:listId/:itemId", () => {
   });
 });
 
+describe("GET /api/items/:listId auto-hide", () => {
+  it("returns old checked items when auto_hide_done is disabled", async () => {
+    // Create and check an item
+    const createRes = await app.request(
+      `/api/items/${listId}`,
+      req({ method: "POST", body: { text: "Old Item" } }),
+      env,
+    );
+    const { id: itemId } = await createRes.json();
+    await app.request(
+      `/api/items/${listId}/${itemId}`,
+      req({ method: "PATCH", body: { checked: true } }),
+      env,
+    );
+
+    // Backdate checked_at to 3 days ago
+    const db = createDb(env.DB);
+    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .replace(/\.\d{3}Z$/, "Z");
+    await db
+      .updateTable("items")
+      .set({ checked_at: threeDaysAgo })
+      .where("id", "=", itemId)
+      .execute();
+
+    // With auto_hide_done enabled (default), item should be hidden
+    const res1 = await app.request(`/api/items/${listId}`, req(), env);
+    const items1 = await res1.json();
+    expect(items1.find((i: { id: string }) => i.id === itemId)).toBeUndefined();
+
+    // Disable auto_hide_done
+    await app.request(
+      `/api/lists/${listId}`,
+      req({ method: "PATCH", body: { autoHideDone: false } }),
+      env,
+    );
+
+    // Now the old item should be returned
+    const res2 = await app.request(`/api/items/${listId}`, req(), env);
+    const items2 = await res2.json();
+    expect(items2.find((i: { id: string }) => i.id === itemId)).toBeDefined();
+  });
+});
+
 describe("PUT /api/items/:listId/reorder", () => {
   it("updates item positions", async () => {
     const res1 = await app.request(

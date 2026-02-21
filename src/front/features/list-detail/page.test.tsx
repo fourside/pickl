@@ -99,6 +99,24 @@ describe("ListDetailPage", () => {
     expect(await screen.findByText("No items yet")).toBeInTheDocument();
   });
 
+  it("shows settings menu trigger for participants", async () => {
+    renderDetail("list-1");
+
+    await screen.findByRole("heading", { name: "Groceries" });
+    expect(
+      screen.getByRole("button", { name: "List settings" }),
+    ).toBeInTheDocument();
+  });
+
+  it("hides settings menu trigger for non-participants", async () => {
+    renderDetail("list-2");
+
+    await screen.findByText("View only");
+    expect(
+      screen.queryByRole("button", { name: "List settings" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("joins a list when Join is clicked", async () => {
     const joinedLists = testLists.map((l) =>
       l.id === "list-2" ? { ...l, isParticipant: true } : l,
