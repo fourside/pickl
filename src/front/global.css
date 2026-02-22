@@ -56,6 +56,10 @@ textarea {
 
   /* Shadow */
   --shadow-md: 0 4px 12px rgb(0 0 0 / 0.15);
+
+  /* Z-index */
+  --z-sticky: 10;
+  --z-overlay: 100;
 }
 
 :root[data-theme="dark"] {
