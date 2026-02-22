@@ -231,6 +231,35 @@
   box-shadow: var(--shadow-md);
 }
 
+/* Swipe-to-delete */
+
+.swipeContainer {
+  position: relative;
+  overflow: hidden;
+}
+
+.swipeDeleteAction {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-error);
+  color: var(--color-on-primary);
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+}
+
+.swipeContent {
+  position: relative;
+  background: var(--color-background);
+  will-change: transform;
+}
+
 /* List settings menu */
 
 .menuTrigger {

@@ -38,12 +38,16 @@ import {
 import { ItemRow } from "./item-row";
 import styles from "./list-detail.module.css";
 import { SortableItem } from "./sortable-item";
+import { SwipeableItemRow } from "./swipeable-item-row";
+import { useIsTouchDevice } from "./use-is-touch-device";
 
 export function ListDetailPage() {
   const { id: listId } = useParams<{ id: string }>();
+  const isTouchDevice = useIsTouchDevice();
   const [isDragging, setIsDragging] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [editName, setEditName] = useState("");
+  const [revealedItemId, setRevealedItemId] = useState<string | null>(null);
   const [doneSortOrder, setDoneSortOrder] = useState<"newest" | "alphabetical">(
     "newest",
   );
@@ -302,7 +306,10 @@ export function ListDetailPage() {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          onDragStart={() => setIsDragging(true)}
+          onDragStart={() => {
+            setIsDragging(true);
+            setRevealedItemId(null);
+          }}
           onDragEnd={handleDragEnd}
         >
           <SortableContext
@@ -315,6 +322,8 @@ export function ListDetailPage() {
                   key={item.id}
                   item={item}
                   isParticipant={isParticipant}
+                  isTouchDevice={isTouchDevice}
+                  isRevealed={revealedItemId === item.id}
                   className={
                     item.id === lastAddedIdRef.current
                       ? styles.slideIn
@@ -322,6 +331,7 @@ export function ListDetailPage() {
                   }
                   onCheck={handleCheck}
                   onDelete={handleDelete}
+                  onReveal={setRevealedItemId}
                 />
               ))}
             </div>
@@ -372,12 +382,23 @@ export function ListDetailPage() {
                     : undefined
                 }
               >
-                <ItemRow
-                  item={item}
-                  isParticipant={isParticipant}
-                  onCheck={handleCheck}
-                  onDelete={handleDelete}
-                />
+                {isTouchDevice ? (
+                  <SwipeableItemRow
+                    item={item}
+                    isParticipant={isParticipant}
+                    isRevealed={revealedItemId === item.id}
+                    onCheck={handleCheck}
+                    onDelete={handleDelete}
+                    onReveal={setRevealedItemId}
+                  />
+                ) : (
+                  <ItemRow
+                    item={item}
+                    isParticipant={isParticipant}
+                    onCheck={handleCheck}
+                    onDelete={handleDelete}
+                  />
+                )}
               </div>
             ))}
           </div>

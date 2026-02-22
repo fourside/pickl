@@ -6,7 +6,7 @@ interface ItemRowProps {
   item: ItemData;
   isParticipant: boolean;
   onCheck: (itemId: string, checked: boolean) => void;
-  onDelete: (itemId: string) => void;
+  onDelete?: (itemId: string) => void;
 }
 
 export function ItemRow({
@@ -25,7 +25,7 @@ export function ItemRow({
         aria-label={`${item.checked ? "Uncheck" : "Check"} ${item.text}`}
       />
       <span className={item.checked ? styles.checked : ""}>{item.text}</span>
-      {isParticipant && (
+      {isParticipant && onDelete && (
         <button
           type="button"
           className={styles.deleteButton}
