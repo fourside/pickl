@@ -17,13 +17,13 @@ export function useSwipeToReveal({
   disabled,
 }: UseSwipeToRevealOptions) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const actionRef = useRef<HTMLButtonElement>(null);
 
   const startXRef = useRef(0);
   const startYRef = useRef(0);
   const startTimeRef = useRef(0);
   const directionRef = useRef<"horizontal" | "vertical" | null>(null);
-  const currentXRef = useRef(0);
+  const currentXRef = useRef(REVEAL_WIDTH);
   const rafRef = useRef(0);
 
   const prefersReducedMotion = useRef(
@@ -31,7 +31,7 @@ export function useSwipeToReveal({
   );
 
   const applyTransform = useCallback((x: number, animate: boolean) => {
-    const el = contentRef.current;
+    const el = actionRef.current;
     if (!el) return;
     el.style.transition =
       animate && !prefersReducedMotion.current
@@ -42,7 +42,7 @@ export function useSwipeToReveal({
 
   const snapTo = useCallback(
     (revealed: boolean) => {
-      const targetX = revealed ? -REVEAL_WIDTH : 0;
+      const targetX = revealed ? 0 : REVEAL_WIDTH;
       applyTransform(targetX, true);
       currentXRef.current = targetX;
       onReveal(revealed);
@@ -52,7 +52,7 @@ export function useSwipeToReveal({
 
   // Sync with external isRevealed prop
   useEffect(() => {
-    const targetX = isRevealed ? -REVEAL_WIDTH : 0;
+    const targetX = isRevealed ? 0 : REVEAL_WIDTH;
     if (currentXRef.current !== targetX) {
       applyTransform(targetX, true);
       currentXRef.current = targetX;
@@ -90,10 +90,11 @@ export function useSwipeToReveal({
       e.preventDefault();
 
       rafRef.current = requestAnimationFrame(() => {
-        const baseX = isRevealed ? -REVEAL_WIDTH : 0;
-        const rawX = baseX + deltaX;
-        const clampedX = Math.max(-REVEAL_WIDTH, Math.min(0, rawX));
-        const el = contentRef.current;
+        // Action button: REVEAL_WIDTH = off-screen, 0 = fully visible
+        const baseX = isRevealed ? 0 : REVEAL_WIDTH;
+        const rawX = baseX - deltaX;
+        const clampedX = Math.max(0, Math.min(REVEAL_WIDTH, rawX));
+        const el = actionRef.current;
         if (!el) return;
         el.style.transition = "none";
         el.style.transform = `translateX(${clampedX}px)`;
@@ -135,5 +136,5 @@ export function useSwipeToReveal({
     };
   }, [disabled, isRevealed, snapTo]);
 
-  return { containerRef, contentRef };
+  return { containerRef, actionRef };
 }

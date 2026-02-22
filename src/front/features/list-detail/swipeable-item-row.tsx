@@ -21,7 +21,7 @@ export function SwipeableItemRow({
   onDelete,
   onReveal,
 }: SwipeableItemRowProps) {
-  const { containerRef, contentRef } = useSwipeToReveal({
+  const { containerRef, actionRef } = useSwipeToReveal({
     isRevealed,
     onReveal: (revealed) => onReveal(revealed ? item.id : null),
     disabled: !isParticipant,
@@ -34,6 +34,7 @@ export function SwipeableItemRow({
 
   return (
     <div className={styles.swipeContainer} ref={containerRef}>
+      <ItemRow item={item} isParticipant={isParticipant} onCheck={onCheck} />
       {isParticipant && (
         <button
           type="button"
@@ -41,13 +42,11 @@ export function SwipeableItemRow({
           onClick={handleDelete}
           aria-label={`Delete ${item.text}`}
           tabIndex={isRevealed ? 0 : -1}
+          ref={actionRef}
         >
           <TrashIcon />
         </button>
       )}
-      <div className={styles.swipeContent} ref={contentRef}>
-        <ItemRow item={item} isParticipant={isParticipant} onCheck={onCheck} />
-      </div>
     </div>
   );
 }
