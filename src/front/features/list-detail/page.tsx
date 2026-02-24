@@ -41,6 +41,17 @@ import { SortableItem } from "./sortable-item";
 import { SwipeableItemRow } from "./swipeable-item-row";
 import { useIsTouchDevice } from "./use-is-touch-device";
 
+const DONE_SORT_ORDER_KEY = "done-sort-order";
+type DoneSortOrder = "newest" | "alphabetical";
+
+function getStoredDoneSortOrder(): DoneSortOrder {
+  const stored = localStorage.getItem(DONE_SORT_ORDER_KEY);
+  if (stored === "newest" || stored === "alphabetical") {
+    return stored;
+  }
+  return "newest";
+}
+
 export function ListDetailPage() {
   const { id: listId } = useParams<{ id: string }>();
   const isTouchDevice = useIsTouchDevice();
@@ -48,8 +59,8 @@ export function ListDetailPage() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editName, setEditName] = useState("");
   const [revealedItemId, setRevealedItemId] = useState<string | null>(null);
-  const [doneSortOrder, setDoneSortOrder] = useState<"newest" | "alphabetical">(
-    "newest",
+  const [doneSortOrder, setDoneSortOrder] = useState<DoneSortOrder>(
+    getStoredDoneSortOrder,
   );
   const nameInputRef = useRef<HTMLInputElement>(null);
   const lastAddedIdRef = useRef<string | null>(null);
@@ -351,7 +362,10 @@ export function ListDetailPage() {
                     ? styles.sortButtonActive
                     : styles.sortButton
                 }
-                onClick={() => setDoneSortOrder("newest")}
+                onClick={() => {
+                  setDoneSortOrder("newest");
+                  localStorage.setItem(DONE_SORT_ORDER_KEY, "newest");
+                }}
                 aria-label="Sort by newest"
                 title="Sort by newest"
               >
@@ -364,7 +378,10 @@ export function ListDetailPage() {
                     ? styles.sortButtonActive
                     : styles.sortButton
                 }
-                onClick={() => setDoneSortOrder("alphabetical")}
+                onClick={() => {
+                  setDoneSortOrder("alphabetical");
+                  localStorage.setItem(DONE_SORT_ORDER_KEY, "alphabetical");
+                }}
                 aria-label="Sort alphabetically"
                 title="Sort alphabetically"
               >
