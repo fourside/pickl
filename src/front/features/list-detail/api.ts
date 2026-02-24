@@ -46,6 +46,10 @@ export function joinList(listId: string): Promise<void> {
   return apiFetch(`/lists/${listId}/join`, { method: "POST" });
 }
 
+export function leaveList(listId: string): Promise<void> {
+  return apiFetch(`/lists/${listId}/leave`, { method: "POST" });
+}
+
 export function updateListName(listId: string, name: string): Promise<void> {
   return apiFetch(`/lists/${listId}`, {
     method: "PATCH",

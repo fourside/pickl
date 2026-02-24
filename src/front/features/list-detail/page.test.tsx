@@ -145,4 +145,37 @@ describe("ListDetailPage", () => {
       expect(screen.queryByText("View only")).not.toBeInTheDocument();
     });
   });
+
+  it("leaves a list via menu with confirmation", async () => {
+    const leftLists = testLists.map((l) =>
+      l.id === "list-1" ? { ...l, isParticipant: false } : l,
+    );
+
+    const user = userEvent.setup();
+    renderDetail("list-1");
+
+    await screen.findByRole("heading", { name: "Groceries" });
+
+    let left = false;
+    server.use(
+      http.post("/api/lists/:listId/leave", () => {
+        left = true;
+        return HttpResponse.json({ ok: true });
+      }),
+      http.get("/api/lists", () => {
+        return HttpResponse.json(left ? leftLists : testLists);
+      }),
+    );
+
+    await user.click(screen.getByRole("button", { name: "List settings" }));
+    await user.click(await screen.findByText("Leave list"));
+
+    expect(await screen.findByText("Leave this list?")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Leave" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("View only")).toBeInTheDocument();
+    });
+  });
 });

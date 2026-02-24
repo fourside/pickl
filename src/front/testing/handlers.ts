@@ -164,4 +164,8 @@ export const handlers = [
   http.post("/api/lists/:listId/join", () => {
     return HttpResponse.json({});
   }),
+
+  http.post("/api/lists/:listId/leave", () => {
+    return HttpResponse.json({ ok: true });
+  }),
 ];

@@ -1,3 +1,4 @@
+import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Menu } from "@base-ui/react/menu";
 import {
   closestCenter,
@@ -30,6 +31,7 @@ import {
   createItem,
   deleteItem,
   joinList,
+  leaveList,
   reorderItems,
   updateItem,
   updateListAutoHide,
@@ -147,6 +149,14 @@ export function ListDetailPage() {
     mutateLists();
   }, [listId, mutateLists]);
 
+  const [leaveOpen, setLeaveOpen] = useState(false);
+  const handleLeave = useCallback(async () => {
+    if (!listId) return;
+    await leaveList(listId);
+    setLeaveOpen(false);
+    mutateLists();
+  }, [listId, mutateLists]);
+
   const handleStartEditName = useCallback(() => {
     if (!list || !isParticipant) return;
     setEditName(list.name);
@@ -260,37 +270,67 @@ export function ListDetailPage() {
           )}
         </div>
         {isParticipant && (
-          <Menu.Root>
-            <Menu.Trigger
-              className={styles.menuTrigger}
-              aria-label="List settings"
-            >
-              <MoreVerticalIcon />
-            </Menu.Trigger>
-            <Menu.Portal>
-              <Menu.Positioner
-                side="bottom"
-                align="end"
-                sideOffset={4}
-                positionMethod="fixed"
-                className={styles.menuPositioner}
+          <>
+            <Menu.Root>
+              <Menu.Trigger
+                className={styles.menuTrigger}
+                aria-label="List settings"
               >
-                <Menu.Popup className={styles.menuPopup}>
-                  <Menu.CheckboxItem
-                    className={styles.menuCheckboxItem}
-                    checked={list?.autoHideDone ?? true}
-                    onCheckedChange={handleToggleAutoHide}
-                    closeOnClick={false}
-                  >
-                    <Menu.CheckboxItemIndicator
-                      className={styles.menuItemIndicator}
-                    />
-                    48時間後に非表示
-                  </Menu.CheckboxItem>
-                </Menu.Popup>
-              </Menu.Positioner>
-            </Menu.Portal>
-          </Menu.Root>
+                <MoreVerticalIcon />
+              </Menu.Trigger>
+              <Menu.Portal>
+                <Menu.Positioner
+                  side="bottom"
+                  align="end"
+                  sideOffset={4}
+                  positionMethod="fixed"
+                  className={styles.menuPositioner}
+                >
+                  <Menu.Popup className={styles.menuPopup}>
+                    <Menu.CheckboxItem
+                      className={styles.menuCheckboxItem}
+                      checked={list?.autoHideDone ?? true}
+                      onCheckedChange={handleToggleAutoHide}
+                      closeOnClick={false}
+                    >
+                      <Menu.CheckboxItemIndicator
+                        className={styles.menuItemIndicator}
+                      />
+                      Auto-hide after 48h
+                    </Menu.CheckboxItem>
+                    <Menu.Item
+                      className={styles.menuItemDanger}
+                      onClick={() => setLeaveOpen(true)}
+                    >
+                      Leave list
+                    </Menu.Item>
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Portal>
+            </Menu.Root>
+            <AlertDialog.Root open={leaveOpen} onOpenChange={setLeaveOpen}>
+              <AlertDialog.Portal>
+                <AlertDialog.Backdrop className={styles.alertBackdrop} />
+                <AlertDialog.Popup className={styles.alertPopup}>
+                  <AlertDialog.Title className={styles.alertTitle}>
+                    Leave this list?
+                  </AlertDialog.Title>
+                  <div className={styles.alertActions}>
+                    <AlertDialog.Close className={styles.alertCancel}>
+                      Cancel
+                    </AlertDialog.Close>
+                    <button
+                      type="button"
+                      className={styles.alertDanger}
+                      onClick={handleLeave}
+                    >
+                      Leave
+                    </button>
+                  </div>
+                </AlertDialog.Popup>
+              </AlertDialog.Portal>
+            </AlertDialog.Root>
+          </>
         )}
       </div>
 
