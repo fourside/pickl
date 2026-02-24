@@ -30,6 +30,7 @@ jobs:
           node-version-file: ".nvmrc"
           cache: "npm"
       - run: npm ci
+      - run: echo "JWT_SECRET=e2e-test-secret" > .dev.vars
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
       - uses: actions/upload-artifact@v4
