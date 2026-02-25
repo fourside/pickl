@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { ListItem } from "./api";
 import { ListCard } from "./list-card";
 
@@ -44,5 +45,55 @@ describe("ListCard", () => {
     );
 
     expect(screen.getByText("View")).toBeInTheDocument();
+  });
+
+  it("shows trash icon when user is creator", () => {
+    render(
+      <MemoryRouter>
+        <ListCard
+          list={baseList}
+          currentUserId="user-1"
+          onDeleteClick={vi.fn()}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Delete list" }),
+    ).toBeInTheDocument();
+  });
+
+  it("hides trash icon when user is not creator", () => {
+    render(
+      <MemoryRouter>
+        <ListCard
+          list={baseList}
+          currentUserId="user-2"
+          onDeleteClick={vi.fn()}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Delete list" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("calls onDeleteClick with list id when trash icon clicked", async () => {
+    const user = userEvent.setup();
+    const onDeleteClick = vi.fn();
+
+    render(
+      <MemoryRouter>
+        <ListCard
+          list={baseList}
+          currentUserId="user-1"
+          onDeleteClick={onDeleteClick}
+        />
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Delete list" }));
+    expect(onDeleteClick).toHaveBeenCalledWith("list-1");
   });
 });

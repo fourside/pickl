@@ -164,6 +164,10 @@ export const handlers = [
     return HttpResponse.json({ ok: true });
   }),
 
+  http.delete("/api/lists/:listId", () => {
+    return HttpResponse.json({ ok: true });
+  }),
+
   http.post("/api/lists/:listId/join", () => {
     return HttpResponse.json({});
   }),

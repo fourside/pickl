@@ -24,3 +24,7 @@ export function createList(name: string): Promise<ListItem> {
     body: JSON.stringify({ name }),
   });
 }
+
+export function deleteList(listId: string): Promise<void> {
+  return apiFetch(`/lists/${listId}`, { method: "DELETE" });
+}

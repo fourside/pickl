@@ -1,13 +1,21 @@
 import { Link } from "react-router";
-import { LockIcon } from "../../shared/components/icons";
+import { LockIcon, TrashIcon } from "../../shared/components/icons";
 import type { ListItem } from "./api";
 import styles from "./lists.module.css";
 
 interface ListCardProps {
   list: ListItem;
+  currentUserId?: string;
+  onDeleteClick?: (listId: string) => void;
 }
 
-export function ListCard({ list }: ListCardProps) {
+export function ListCard({
+  list,
+  currentUserId,
+  onDeleteClick,
+}: ListCardProps) {
+  const isCreator = list.createdBy === currentUserId;
+
   return (
     <Link to={`/lists/${list.id}`} className={styles.card}>
       <span className={styles.cardName}>
@@ -34,6 +42,20 @@ export function ListCard({ list }: ListCardProps) {
           ),
         )}
       </div>
+      {isCreator && onDeleteClick && (
+        <button
+          type="button"
+          className={styles.deleteListButton}
+          aria-label="Delete list"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDeleteClick(list.id);
+          }}
+        >
+          <TrashIcon />
+        </button>
+      )}
       <span
         className={`${styles.badge} ${!list.isParticipant ? styles.badgeInactive : ""}`}
       >

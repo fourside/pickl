@@ -352,3 +352,77 @@ describe("POST /api/lists/:id/leave", () => {
     expect(left.isParticipant).toBe(false);
   });
 });
+
+describe("DELETE /api/lists/:id", () => {
+  it("creator can delete a list", async () => {
+    const createRes = await app.request(
+      "/api/lists",
+      authHeaders({ name: "My List" }),
+      env,
+    );
+    const { id: listId } = await createRes.json();
+
+    const res = await app.request(
+      `/api/lists/${listId}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      },
+      env,
+    );
+
+    expect(res.status).toBe(200);
+
+    // Verify list is gone
+    const listsRes = await app.request("/api/lists", authHeaders(), env);
+    const lists = await listsRes.json();
+    expect(lists.some((l: { id: string }) => l.id === listId)).toBe(false);
+  });
+
+  it("non-creator gets 403", async () => {
+    const createRes = await app.request(
+      "/api/lists",
+      authHeaders({ name: "My List" }),
+      env,
+    );
+    const { id: listId } = await createRes.json();
+
+    const token2 = await createUser2();
+
+    // user-2 joins the list first
+    await app.request(
+      `/api/lists/${listId}/join`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token2}` },
+      },
+      env,
+    );
+
+    const res = await app.request(
+      `/api/lists/${listId}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token2}` },
+      },
+      env,
+    );
+
+    expect(res.status).toBe(403);
+    const body = await res.json();
+    expect(body.error).toBe("Only the list creator can delete a list");
+  });
+
+  it("returns 404 for non-existent list", async () => {
+    const res = await app.request(
+      "/api/lists/non-existent",
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      },
+      env,
+    );
+
+    expect(res.status).toBe(404);
+  });
+});

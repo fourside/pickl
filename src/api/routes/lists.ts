@@ -251,3 +251,33 @@ listsRoutes.post("/:id/leave", async (c) => {
 
   return c.json({ ok: true });
 });
+
+// Delete a list (creator only)
+listsRoutes.delete("/:id", async (c) => {
+  const listId = c.req.param("id");
+  const userId = c.get("userId");
+  const db = c.get("db");
+
+  const list = await db
+    .selectFrom("lists")
+    .select("created_by")
+    .where("id", "=", listId)
+    .executeTakeFirst();
+
+  if (!list) {
+    return c.json({ error: "List not found" }, 404);
+  }
+
+  if (list.created_by !== userId) {
+    return c.json({ error: "Only the list creator can delete a list" }, 403);
+  }
+
+  await db.deleteFrom("items").where("list_id", "=", listId).execute();
+  await db
+    .deleteFrom("list_participants")
+    .where("list_id", "=", listId)
+    .execute();
+  await db.deleteFrom("lists").where("id", "=", listId).execute();
+
+  return c.json({ ok: true });
+});

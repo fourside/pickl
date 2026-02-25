@@ -1,10 +1,12 @@
+import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { useCallback, useState } from "react";
 import { Link } from "react-router";
 import useSWR from "swr";
 import { swrFetcher } from "../../shared/api/client";
 import { useAuth } from "../../shared/auth/auth-context";
 import { InputBar } from "../../shared/components/input-bar";
 import type { ListItem } from "./api";
-import { createList } from "./api";
+import { createList, deleteList } from "./api";
 import { ListCard } from "./list-card";
 import styles from "./lists.module.css";
 
@@ -13,11 +15,21 @@ export function ListsPage() {
   const { data: lists, mutate } = useSWR<ListItem[]>("/lists", swrFetcher, {
     refreshInterval: 30000,
   });
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const handleCreate = async (name: string) => {
     const newList = await createList(name);
     mutate((prev) => [newList, ...(prev ?? [])], false);
   };
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTarget) return;
+    const targetId = deleteTarget;
+    mutate((prev) => prev?.filter((l) => l.id !== targetId), false);
+    setDeleteTarget(null);
+    await deleteList(targetId);
+    mutate();
+  }, [deleteTarget, mutate]);
 
   return (
     <div className={styles.page}>
@@ -44,12 +56,45 @@ export function ListsPage() {
 
       <div className={styles.listGrid}>
         {lists?.map((list) => (
-          <ListCard key={list.id} list={list} />
+          <ListCard
+            key={list.id}
+            list={list}
+            currentUserId={user?.id}
+            onDeleteClick={setDeleteTarget}
+          />
         ))}
         {lists && lists.length === 0 && (
           <p className={styles.empty}>No lists yet</p>
         )}
       </div>
+
+      <AlertDialog.Root
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+      >
+        <AlertDialog.Portal>
+          <AlertDialog.Backdrop className={styles.alertBackdrop} />
+          <AlertDialog.Popup className={styles.alertPopup}>
+            <AlertDialog.Title className={styles.alertTitle}>
+              Delete this list?
+            </AlertDialog.Title>
+            <div className={styles.alertActions}>
+              <AlertDialog.Close className={styles.alertCancel}>
+                Cancel
+              </AlertDialog.Close>
+              <button
+                type="button"
+                className={styles.alertDanger}
+                onClick={handleDeleteConfirm}
+              >
+                Delete
+              </button>
+            </div>
+          </AlertDialog.Popup>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
     </div>
   );
 }
