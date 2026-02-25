@@ -35,6 +35,13 @@
   cursor: pointer;
 }
 
+.lockIcon {
+  display: inline-flex;
+  margin-left: 0.25rem;
+  color: var(--color-text-muted);
+  vertical-align: middle;
+}
+
 .headerAvatars {
   display: flex;
   gap: 0.25rem;

@@ -23,4 +23,5 @@ export const CreateListRequestSchema = v.object({
 export const UpdateListRequestSchema = v.object({
   name: v.optional(v.pipe(v.string(), v.nonEmpty())),
   autoHideDone: v.optional(v.boolean()),
+  isPrivate: v.optional(v.boolean()),
 });

@@ -20,6 +20,7 @@ export const testLists: ListItem[] = [
     updatedAt: now,
     isParticipant: true,
     autoHideDone: true,
+    isPrivate: false,
     participants: [{ id: "user-1", name: "Test User", avatarUrl: null }],
   },
   {
@@ -30,6 +31,7 @@ export const testLists: ListItem[] = [
     updatedAt: now,
     isParticipant: false,
     autoHideDone: true,
+    isPrivate: false,
     participants: [{ id: "user-2", name: "Other User", avatarUrl: null }],
   },
 ];
@@ -103,6 +105,7 @@ export const handlers = [
       updatedAt: now,
       isParticipant: true,
       autoHideDone: true,
+      isPrivate: false,
       participants: [{ id: "user-1", name: "Test User", avatarUrl: null }],
     };
     return HttpResponse.json(newList);

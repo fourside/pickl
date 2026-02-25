@@ -16,6 +16,7 @@ export interface Database {
     id: string;
     name: string;
     auto_hide_done: number;
+    is_private: number;
     created_by: string;
     created_at: string;
     updated_at: string;

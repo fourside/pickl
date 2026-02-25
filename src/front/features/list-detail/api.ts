@@ -66,3 +66,13 @@ export function updateListAutoHide(
     body: JSON.stringify({ autoHideDone }),
   });
 }
+
+export function updateListPrivate(
+  listId: string,
+  isPrivate: boolean,
+): Promise<void> {
+  return apiFetch(`/lists/${listId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ isPrivate }),
+  });
+}

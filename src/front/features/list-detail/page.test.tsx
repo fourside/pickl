@@ -146,6 +146,42 @@ describe("ListDetailPage", () => {
     });
   });
 
+  it("hides Join button for private lists", async () => {
+    const privateLists = testLists.map((l) =>
+      l.id === "list-2" ? { ...l, isPrivate: true } : l,
+    );
+    renderDetail("list-2", privateLists);
+
+    expect(await screen.findByText("Private list")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Join" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows Private list toggle in settings menu for creator", async () => {
+    const user = userEvent.setup();
+    renderDetail("list-1");
+
+    await screen.findByRole("heading", { name: "Groceries" });
+    await user.click(screen.getByRole("button", { name: "List settings" }));
+
+    expect(await screen.findByText("Private list")).toBeInTheDocument();
+  });
+
+  it("hides Private list toggle for non-creator participant", async () => {
+    const user = userEvent.setup();
+    const listsWithDifferentCreator = testLists.map((l) =>
+      l.id === "list-1" ? { ...l, createdBy: "user-other" } : l,
+    );
+    renderDetail("list-1", listsWithDifferentCreator);
+
+    await screen.findByRole("heading", { name: "Groceries" });
+    await user.click(screen.getByRole("button", { name: "List settings" }));
+
+    await screen.findByText("Auto-hide after 48h");
+    expect(screen.queryByText("Private list")).not.toBeInTheDocument();
+  });
+
   it("leaves a list via menu with confirmation", async () => {
     const leftLists = testLists.map((l) =>
       l.id === "list-1" ? { ...l, isParticipant: false } : l,

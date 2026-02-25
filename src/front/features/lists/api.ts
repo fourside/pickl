@@ -14,6 +14,7 @@ export interface ListItem {
   updatedAt: string;
   isParticipant: boolean;
   autoHideDone: boolean;
+  isPrivate: boolean;
   participants: Participant[];
 }
 

@@ -24,6 +24,7 @@ listsRoutes.get("/", async (c) => {
       "lists.id",
       "lists.name",
       "lists.auto_hide_done",
+      "lists.is_private",
       "lists.created_by",
       "lists.created_at",
       "lists.updated_at",
@@ -62,8 +63,12 @@ listsRoutes.get("/", async (c) => {
     participantsByList.set(p.list_id, list);
   }
 
+  const visibleLists = lists.filter(
+    (list) => list.participant_user_id !== null || list.is_private !== 1,
+  );
+
   return c.json(
-    lists.map((list) => ({
+    visibleLists.map((list) => ({
       id: list.id,
       name: list.name,
       createdBy: list.created_by,
@@ -71,6 +76,7 @@ listsRoutes.get("/", async (c) => {
       updatedAt: list.updated_at,
       isParticipant: list.participant_user_id !== null,
       autoHideDone: list.auto_hide_done === 1,
+      isPrivate: list.is_private === 1,
       participants: participantsByList.get(list.id) ?? [],
     })),
   );
@@ -124,6 +130,7 @@ listsRoutes.post("/", async (c) => {
       updatedAt: now,
       isParticipant: true,
       autoHideDone: true,
+      isPrivate: false,
       participants: [
         {
           id: userId,
@@ -168,6 +175,17 @@ listsRoutes.patch("/:id", async (c) => {
   if (result.output.autoHideDone !== undefined) {
     updates.auto_hide_done = result.output.autoHideDone ? 1 : 0;
   }
+  if (result.output.isPrivate !== undefined) {
+    const list = await db
+      .selectFrom("lists")
+      .select("created_by")
+      .where("id", "=", listId)
+      .executeTakeFirst();
+    if (list?.created_by !== userId) {
+      return c.json({ error: "Only the list creator can change privacy" }, 403);
+    }
+    updates.is_private = result.output.isPrivate ? 1 : 0;
+  }
 
   await db.updateTable("lists").set(updates).where("id", "=", listId).execute();
 
@@ -182,12 +200,16 @@ listsRoutes.post("/:id/join", async (c) => {
 
   const list = await db
     .selectFrom("lists")
-    .select("id")
+    .select(["id", "is_private"])
     .where("id", "=", listId)
     .executeTakeFirst();
 
   if (!list) {
     return c.json({ error: "List not found" }, 404);
+  }
+
+  if (list.is_private === 1) {
+    return c.json({ error: "This list is private" }, 403);
   }
 
   const existing = await db

@@ -18,9 +18,11 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import useSWR from "swr";
 import { swrFetcher } from "../../shared/api/client";
+import { useAuth } from "../../shared/auth/auth-context";
 import {
   ArrowLeftIcon,
   ClockIcon,
+  LockIcon,
   MoreVerticalIcon,
   SortAZIcon,
 } from "../../shared/components/icons";
@@ -36,6 +38,7 @@ import {
   updateItem,
   updateListAutoHide,
   updateListName,
+  updateListPrivate,
 } from "./api";
 import { ItemRow } from "./item-row";
 import styles from "./list-detail.module.css";
@@ -56,6 +59,7 @@ function getStoredDoneSortOrder(): DoneSortOrder {
 
 export function ListDetailPage() {
   const { id: listId } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const isTouchDevice = useIsTouchDevice();
   const [isDragging, setIsDragging] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -197,6 +201,24 @@ export function ListDetailPage() {
     [listId, mutateLists, mutateItems],
   );
 
+  const isCreator = list?.createdBy === user?.id;
+
+  const handleTogglePrivate = useCallback(
+    async (checked: boolean) => {
+      if (!listId) return;
+      mutateLists(
+        (prev) =>
+          prev?.map((l) =>
+            l.id === listId ? { ...l, isPrivate: checked } : l,
+          ),
+        false,
+      );
+      await updateListPrivate(listId, checked);
+      mutateLists();
+    },
+    [listId, mutateLists],
+  );
+
   const handleDragEnd = useCallback(
     async (event: DragEndEvent) => {
       setIsDragging(false);
@@ -251,6 +273,11 @@ export function ListDetailPage() {
             className={isParticipant ? styles.editableName : undefined}
           >
             {list?.name ?? "..."}
+            {list?.isPrivate && (
+              <span className={styles.lockIcon}>
+                <LockIcon />
+              </span>
+            )}
           </h1>
         )}
         <div className={styles.headerAvatars}>
@@ -298,6 +325,19 @@ export function ListDetailPage() {
                       />
                       Auto-hide after 48h
                     </Menu.CheckboxItem>
+                    {isCreator && (
+                      <Menu.CheckboxItem
+                        className={styles.menuCheckboxItem}
+                        checked={list?.isPrivate ?? false}
+                        onCheckedChange={handleTogglePrivate}
+                        closeOnClick={false}
+                      >
+                        <Menu.CheckboxItemIndicator
+                          className={styles.menuItemIndicator}
+                        />
+                        Private list
+                      </Menu.CheckboxItem>
+                    )}
                     <Menu.Item
                       className={styles.menuItemDanger}
                       onClick={() => setLeaveOpen(true)}
@@ -336,14 +376,16 @@ export function ListDetailPage() {
 
       {!isParticipant && (
         <div className={styles.joinBanner}>
-          <span>View only</span>
-          <button
-            type="button"
-            className={styles.joinButton}
-            onClick={handleJoin}
-          >
-            Join
-          </button>
+          <span>{list?.isPrivate ? "Private list" : "View only"}</span>
+          {!list?.isPrivate && (
+            <button
+              type="button"
+              className={styles.joinButton}
+              onClick={handleJoin}
+            >
+              Join
+            </button>
+          )}
         </div>
       )}
 

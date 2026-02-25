@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { LockIcon } from "../../shared/components/icons";
 import type { ListItem } from "./api";
 import styles from "./lists.module.css";
 
@@ -9,7 +10,14 @@ interface ListCardProps {
 export function ListCard({ list }: ListCardProps) {
   return (
     <Link to={`/lists/${list.id}`} className={styles.card}>
-      <span className={styles.cardName}>{list.name}</span>
+      <span className={styles.cardName}>
+        {list.name}
+        {list.isPrivate && (
+          <span className={styles.lockIcon}>
+            <LockIcon />
+          </span>
+        )}
+      </span>
       <div className={styles.cardAvatars}>
         {list.participants.map((p) =>
           p.avatarUrl ? (
