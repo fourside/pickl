@@ -64,7 +64,10 @@ listsRoutes.get("/", async (c) => {
   }
 
   const visibleLists = lists.filter(
-    (list) => list.participant_user_id !== null || list.is_private !== 1,
+    (list) =>
+      list.participant_user_id !== null ||
+      list.is_private !== 1 ||
+      list.created_by === userId,
   );
 
   return c.json(

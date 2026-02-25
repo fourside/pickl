@@ -326,6 +326,39 @@ describe("GET /api/lists (private filtering)", () => {
     const lists2 = await res2.json();
     expect(lists2.some((l: { id: string }) => l.id === listId)).toBe(false);
   });
+
+  it("creator can still see their private list after leaving", async () => {
+    const createRes = await app.request(
+      "/api/lists",
+      authHeaders({ name: "My Private List" }),
+      env,
+    );
+    const { id: listId } = await createRes.json();
+
+    // Make it private
+    await app.request(
+      `/api/lists/${listId}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isPrivate: true }),
+      },
+      env,
+    );
+
+    // Leave the list
+    await app.request(`/api/lists/${listId}/leave`, authHeaders({}), env);
+
+    // Creator should still see it
+    const listsRes = await app.request("/api/lists", authHeaders(), env);
+    const lists = await listsRes.json();
+    const found = lists.find((l: { id: string }) => l.id === listId);
+    expect(found).toBeDefined();
+    expect(found.isParticipant).toBe(false);
+  });
 });
 
 describe("POST /api/lists/:id/leave", () => {

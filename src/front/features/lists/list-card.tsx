@@ -42,6 +42,11 @@ export function ListCard({
           ),
         )}
       </div>
+      <span
+        className={`${styles.badge} ${!list.isParticipant ? styles.badgeInactive : ""}`}
+      >
+        {list.isParticipant ? "Joined" : "View"}
+      </span>
       {isCreator && onDeleteClick && (
         <button
           type="button"
@@ -56,11 +61,6 @@ export function ListCard({
           <TrashIcon />
         </button>
       )}
-      <span
-        className={`${styles.badge} ${!list.isParticipant ? styles.badgeInactive : ""}`}
-      >
-        {list.isParticipant ? "Joined" : "View"}
-      </span>
     </Link>
   );
 }
